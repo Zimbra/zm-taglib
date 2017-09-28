@@ -606,4 +606,9 @@ public class ZJspSession {
         return remoteIp.getRequestIP();
     }
 
+    public static String buildRedirectURL(PageContext context, String URI) {
+        String baseURL = (String)context.getAttribute("redirectBaseURL");
+        return String.join("/", baseURL, "/".equals(URI) ? "" : URI);
+    }
+
 }

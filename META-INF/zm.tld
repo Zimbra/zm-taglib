@@ -14,7 +14,7 @@
         <description>sends a message</description>
         <name>sendMessage</name>
         <tag-class>com.zimbra.cs.taglib.tag.SendMessageTag</tag-class>
-        <body-content>empty</body-content>        
+        <body-content>empty</body-content>
         <variable>
             <name-from-attribute>var</name-from-attribute>
             <variable-class>com.zimbra.client.ZMailbox.ZSendMessageResponse</variable-class>
@@ -204,7 +204,7 @@
              <required>false</required>
              <rtexprvalue>true</rtexprvalue>
              <type>com.zimbra.cs.taglib.bean.ZMessageComposeBean</type>
-         </attribute>        
+         </attribute>
         <attribute>
             <description>
                 value of To addresses
@@ -399,7 +399,7 @@
             <rtexprvalue>true</rtexprvalue>
             <type>java.lang.String</type>
         </attribute>
-        
+
         <attribute>
             <description>
                 exception invite id if editing exception
@@ -823,7 +823,7 @@
             </description>
             <name>expanded</name>
             <required>false</required>
-            <rtexprvalue>true</rtexprvalue>            
+            <rtexprvalue>true</rtexprvalue>
             <type>java.util.Map</type>
         </attribute>
     </tag>
@@ -1498,11 +1498,11 @@
                  s - include items in the user's Sent folder (not necessarily "Sent")<br />
                  o - include items in any other folder<br />
                  a leading '-' means to negate the constraint (e.g. "-t" means all messages not in Trash)<br />
-               ]]>                 
+               ]]>
              </description>
              <name>tc</name>
              <required>false</required>
-             <rtexprvalue>true</rtexprvalue>             
+             <rtexprvalue>true</rtexprvalue>
              <type>java.lang.String</type>
          </attribute>
 
@@ -1670,7 +1670,7 @@
             <name>id</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
-            <type>java.lang.String</type>            
+            <type>java.lang.String</type>
         </attribute>
          <attribute>
              <description>flag state (true=flagged, false=unflagged)</description>
@@ -1799,7 +1799,7 @@
             <type>boolean</type>
         </attribute>
     </tag>
-    
+
     <tag>
         <description>
             Mark a conversation as spam/unspam, and optionally move to a specific folder.
@@ -2176,7 +2176,7 @@
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
-        
+
         <attribute>
             <description>contact ids</description>
             <name>contactIds</name>
@@ -2438,7 +2438,7 @@
          <attribute>
              <description>allow unknown contact fields to used</description>
              <name>force</name>
-             <required>false</required>             
+             <required>false</required>
              <rtexprvalue>true</rtexprvalue>
              <type>boolean</type>
          </attribute>
@@ -2479,7 +2479,7 @@
          <attribute>
              <description>replace (true) or merge modify fields with contact</description>
              <name>replace</name>
-             <required>false</required>             
+             <required>false</required>
              <rtexprvalue>true</rtexprvalue>
              <type>boolean</type>
          </attribute>
@@ -2680,7 +2680,7 @@
             <description>the exception</description>
             <name>exception</name>
             <required>true</required>
-            <rtexprvalue>true</rtexprvalue>            
+            <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
 
@@ -2740,7 +2740,7 @@
             <name>restauthtokenobject</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
-        </attribute>        
+        </attribute>
         <attribute>
             <description>
                 target account id for use with REST HTML rendering.
@@ -3183,7 +3183,7 @@
            <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
-        
+
         <attribute>
             <description>mark message as read</description>
             <name>markread</name>
@@ -3312,7 +3312,7 @@
             <name>id</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
-            <type>java.lang.String</type>            
+            <type>java.lang.String</type>
         </attribute>
         <attribute>
             <description>new tag name</description>
@@ -3348,7 +3348,7 @@
             <name>id</name>
             <required>true</required>
             <rtexprvalue>true</rtexprvalue>
-            <type>java.lang.String</type>            
+            <type>java.lang.String</type>
         </attribute>
         <attribute>
             <description>color of tag: orange, blue, cyan, green, purple, red, yellow</description>
@@ -3497,7 +3497,7 @@
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
             <type>java.lang.String</type>
-        </attribute>        
+        </attribute>
     </tag>
 
     <tag>
@@ -4058,7 +4058,7 @@
             <type>java.lang.String</type>
         </attribute>
         <attribute>
-            <description>sort order (dateDesc, dateAsc, subjDesc, subjAsc)</description>            
+            <description>sort order (dateDesc, dateAsc, subjDesc, subjAsc)</description>
             <name>sort</name>
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
@@ -4759,7 +4759,7 @@
             <type>java.lang.String</type>
         </attribute>
     </tag>
-    
+
     <tag>
         <description>
            get appointments that fall with the specified range.
@@ -5017,7 +5017,7 @@
     <tag>
         <description>
             Iterates over an appointment list. If start and end are specified,
-            only return appointments within that range.  
+            only return appointments within that range.
         </description>
         <name>forEachAppoinment</name>
         <tag-class>com.zimbra.cs.taglib.tag.calendar.ForEachAppointmentTag</tag-class>
@@ -5564,7 +5564,7 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
-    
+
     <tag>
         <description>Save attachments as documents to a briefcase folder</description>
         <name>saveAttachmentsToBriefcase</name>
@@ -5585,7 +5585,7 @@
         </attribute>
         <attribute>
             <description>
-                Part id 
+                Part id
             </description>
             <name>partId</name>
             <rtexprvalue>true</rtexprvalue>
@@ -6305,7 +6305,7 @@
 
   <tag>
         <description>
-    	    Interface for ZPhone    
+           Interface for ZPhone
         </description>
 
         <name>phone</name>
@@ -6829,7 +6829,7 @@
             <rtexprvalue>true</rtexprvalue>
             <type>java.lang.String</type>
         </attribute>
-	
+
 	<attribute>
             <description>
                 Map to edit
@@ -6918,7 +6918,7 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
-    
+
 	<!-- These tags are copied from jstl.tld because we implement our own
 	     versions but want to keep API compatibility. -->
 	<!--
@@ -7119,7 +7119,7 @@
             </c:if>
 
             ]]>
-<![CDATA[ ]]>            
+<![CDATA[ ]]>
         </example>
     </function>
 
@@ -7314,6 +7314,12 @@
         <name>getPreLoginRedirectUrl</name>
         <function-class>com.zimbra.cs.taglib.ZJspSession</function-class>
         <function-signature>java.lang.String getPreLoginRedirectUrl(javax.servlet.jsp.PageContext, java.lang.String)</function-signature>
+    </function>
+
+    <function>
+        <name>buildRedirectURL</name>
+        <function-class>com.zimbra.cs.taglib.ZJspSession</function-class>
+        <function-signature>java.lang.String buildRedirectURL(javax.servlet.jsp.PageContext, java.lang.String)</function-signature>
     </function>
 
     <function>
