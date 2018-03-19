@@ -176,7 +176,8 @@ public class ZComposeUploaderBean {
     public static final String F_reminderSendMobile = "reminderSendMobile";
     public static final String F_reminderSendYIM = "reminderSendYIM";
     public static final String F_limitByFileUploadMaxSize = "lbfums";
-    
+    public static final String F_color = "appointmentColor";
+
     private static final long DEFAULT_MAX_SIZE = 10 * 1024 * 1024;
 
     private boolean mIsUpload;
@@ -336,6 +337,10 @@ public class ZComposeUploaderBean {
         compose.setInReplyTo(getParam(F_inreplyto));
         compose.setMessageId(getParam(F_messageid));
         compose.setDraftId(getParam(F_draftid));
+
+        int color = Byte.toUnsignedInt(com.zimbra.common.mailbox.Color.getMappedColor(getParam(F_color)));
+        compose.setColor(String.valueOf(color));
+        // compose.setRgb(null); // custom color is not supported
 
         if (mIsMobile) {
             /* In mobile client, sendUID in the request might be used before because mobile client caches the previous responses.
@@ -590,6 +595,7 @@ public class ZComposeUploaderBean {
 
     public String getPrevSearchOffset() { return getParam(F_prevSearchOffset); }
 
+    public String getColor() { return getParam(F_color); }
 
     public List<ZEmailAddress>  getPendingAttendeesList() {
         try{
