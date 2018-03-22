@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -290,8 +291,8 @@ public class LoginTag extends ZimbraSimpleTag {
     public static boolean isCaptchaValid(String secretKey, String response) {
         try {
             String url = "https://www.google.com/recaptcha/api/siteverify?"
-                    + "secret=" + secretKey
-                    + "&response=" + response;
+                    + "secret=" + URLEncoder.encode(secretKey, "UTF-8")
+                    + "&response=" + URLEncoder.encode(response, "UTF-8");
             InputStream res = new URL(url).openStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(res, Charset.forName("UTF-8")));
 
