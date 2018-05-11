@@ -166,9 +166,19 @@ public class LoginTag extends ZimbraSimpleTag {
                 options.setAuthToken(mAuthToken);
                 options.setAuthAuthToken(true);
             } else {
+                String virtualHost = getVirtualHost(request);
+
+                if (mUsername != null && !mUsername.isEmpty() && mUsername.indexOf("@") != -1) {
+                    String usernameSplit[]= mUsername.split("@");
+
+                    // check if user domain matches current virtual host.
+                    if (!virtualHost.equals(usernameSplit[1])) {
+                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, "", "Invalid username for virtual host = ".concat(virtualHost));
+                    }
+                }
                 options.setAccount(mUsername);
                 options.setPassword(mPassword);
-                options.setVirtualHost(getVirtualHost(request));
+                options.setVirtualHost(virtualHost);
                 if (mNewPassword != null && mNewPassword.length() > 0)
                     options.setNewPassword(mNewPassword);
             }
