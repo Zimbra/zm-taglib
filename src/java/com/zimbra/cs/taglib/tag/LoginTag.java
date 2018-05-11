@@ -171,7 +171,7 @@ public class LoginTag extends ZimbraSimpleTag {
 
                     // check if user domain matches current virtual host.
                     if (!virtualHost.equals(usernameSplit[1])) {
-                        throw AuthFailedServiceException.AUTH_FAILED(usernameSplit[0], "", "Invalid virtual host");
+                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, "", "Invalid username for virtual host = ".concat(virtualHost));
                     }
                 }
                 options.setAccount(mUsername);
