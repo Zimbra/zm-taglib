@@ -157,10 +157,7 @@ public class LoginTag extends ZimbraSimpleTag {
                 options.setAuthToken(mAuthToken);
                 options.setAuthAuthToken(true);
             } else {
-                // get current virtual host
                 String virtualHost = getVirtualHost(request);
-
-                // get the ldap attribute value for zimbraAuthDomainCheckEnabled
                 boolean zimbraAuthDomainCheckEnabled = Provisioning.getInstance().getConfig().getBooleanAttr(Provisioning.A_zimbraAuthDomainCheckEnabled, false);
 
                 if (zimbraAuthDomainCheckEnabled && mUsername != null && !mUsername.isEmpty() && mUsername.indexOf("@") != -1) {
