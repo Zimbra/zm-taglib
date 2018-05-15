@@ -42,7 +42,7 @@ import com.zimbra.common.util.HttpUtil;
 import com.zimbra.common.util.WebSplitUtil;
 import com.zimbra.common.util.ZimbraCookie;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
-import com.zimbra.cs.account.AccountServiceException;
+import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.cs.taglib.ngxlookup.NginxRouteLookUpConnector;
 import com.zimbra.cs.account.AccountServiceException.AuthFailedServiceException;
@@ -121,14 +121,6 @@ public class LoginTag extends ZimbraSimpleTag {
 
     private String getVirtualHost(HttpServletRequest request) {
         return HttpUtil.getVirtualHost(request);
-        /*
-        String virtualHost = request.getHeader("Host");
-        if (virtualHost != null) {
-            int i = virtualHost.indexOf(':');
-            if (i != -1) virtualHost = virtualHost.substring(0, i);
-        }
-        return virtualHost;
-        */
     }
 
     @Override
@@ -167,8 +159,9 @@ public class LoginTag extends ZimbraSimpleTag {
                 options.setAuthAuthToken(true);
             } else {
                 String virtualHost = getVirtualHost(request);
+                boolean zimbraAuthDomainCheckEnabled = Provisioning.getInstance().getConfig().getBooleanAttr(Provisioning.A_zimbraAuthDomainCheckEnabled, false);
 
-                if (mUsername != null && !mUsername.isEmpty() && mUsername.indexOf("@") != -1) {
+                if (zimbraAuthDomainCheckEnabled && mUsername != null && !mUsername.isEmpty() && mUsername.indexOf("@") != -1) {
                     String usernameSplit[]= mUsername.split("@");
 
                     // check if user domain matches current virtual host.
