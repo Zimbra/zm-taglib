@@ -49,6 +49,7 @@ import com.zimbra.client.ZAlarm;
 import com.zimbra.client.ZDateTime;
 import com.zimbra.client.ZEmailAddress;
 import com.zimbra.client.ZFolder;
+import com.zimbra.client.ZFolder.Color;
 import com.zimbra.client.ZIdentity;
 import com.zimbra.client.ZInvite;
 import com.zimbra.client.ZMailbox;
@@ -124,6 +125,8 @@ public class ZMessageComposeBean {
     private String mInviteReplyVerb;
     private long mInviteReplyInst;
     private boolean mInviteReplyAllDay;
+    private String mColor;
+    private String mRgb;
 
     private String mSendUID;
 
@@ -524,6 +527,42 @@ public class ZMessageComposeBean {
 
     public void setSendReminderYIM(boolean mSendReminderYIM) {
         this.mSendReminderYIM = mSendReminderYIM;
+    }
+
+    public void setColor(String color) {
+        mColor = color;
+    }
+
+    public String getColor() {
+        return mColor;
+    }
+
+    public String getRgbColorValue() {
+        int color = 0;
+        try {
+            color = Integer.parseInt(mColor);
+        } catch (NumberFormatException e) {
+        }
+        return new com.zimbra.common.mailbox.Color((byte)color).toString();
+    }
+
+    public String getColorName() {
+        try {
+            int color = 0;
+            color = Integer.parseInt(mColor);
+            Color colorObj = Color.fromInt(color);
+            return colorObj.getName();
+        } catch (NumberFormatException | ServiceException e) {
+        }
+        return null;
+    }
+
+    public void setRgb(String rgb) {
+        mRgb = rgb;
+    }
+
+    public String getRgb() {
+        return mRgb;
     }
 
     public static class AppointmentOptions {
@@ -1140,6 +1179,9 @@ public class ZMessageComposeBean {
             }
             initRepeat(appt.getSimpleRecurrence(), startDate, pc, mailbox);
             initReminders(appt.getAlarms());
+
+            setColor(appt.getColor());
+            setRgb(appt.getRgb());
         }
 
         if(appt.getIsNoBlob()) {
@@ -1488,6 +1530,8 @@ public class ZMessageComposeBean {
         }
 
         comp.setIsAllDay(getAllDay());
+        comp.setColor(mColor);
+        comp.setRgb(mRgb);
 
         if (mAttendees != null && mAttendees.length() > 0) {
             List<ZEmailAddress> addrs =

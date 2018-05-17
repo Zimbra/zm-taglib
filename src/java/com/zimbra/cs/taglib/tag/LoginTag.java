@@ -17,8 +17,14 @@
 package com.zimbra.cs.taglib.tag;
 
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Map;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.net.URLEncoder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +43,9 @@ import com.zimbra.common.util.ZimbraCookie;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.cs.taglib.ngxlookup.NginxRouteLookUpConnector;
+import com.zimbra.cs.account.AccountServiceException.AuthFailedServiceException;
+
+import org.json.JSONObject;
 
 public class LoginTag extends ZimbraSimpleTag {
 
@@ -127,6 +136,10 @@ public class LoginTag extends ZimbraSimpleTag {
             PageContext pageContext = (PageContext) jctxt;
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 
+            if(request.getParameter("captchaId") != null  && request.getParameter("captchaInput") != null && !isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))){
+                throw AuthFailedServiceException.INVALID_CAPTCHA();
+            }
+
             String serverName = request.getServerName();
 
             ZMailbox.Options options = new ZMailbox.Options();
@@ -151,9 +164,19 @@ public class LoginTag extends ZimbraSimpleTag {
                 options.setAuthToken(mAuthToken);
                 options.setAuthAuthToken(true);
             } else {
+                String virtualHost = getVirtualHost(request);
+
+                if (mUsername != null && !mUsername.isEmpty() && mUsername.indexOf("@") != -1) {
+                    String usernameSplit[]= mUsername.split("@");
+
+                    // check if user domain matches current virtual host.
+                    if (!virtualHost.equals(usernameSplit[1])) {
+                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, "", "Invalid username for virtual host = ".concat(virtualHost));
+                    }
+                }
                 options.setAccount(mUsername);
                 options.setPassword(mPassword);
-                options.setVirtualHost(getVirtualHost(request));
+                options.setVirtualHost(virtualHost);
                 if (mNewPassword != null && mNewPassword.length() > 0)
                     options.setNewPassword(mNewPassword);
             }
@@ -264,6 +287,31 @@ public class LoginTag extends ZimbraSimpleTag {
             ZimbraCookie.addHttpOnlyCookie(response, name, trustedToken, path, secondsLeft, secure);
         } else {
             ZimbraCookie.clearCookie(response, name);
+        }
+    }
+
+    public static boolean isCaptchaValid(String captchaId, String captchaInput) {
+        try {
+            String url = "http://localhost:8666/verifyCaptcha?"
+                    + "captchaId=" + URLEncoder.encode(captchaId, "UTF-8")
+                    + "&captchaInput=" + URLEncoder.encode(captchaInput, "UTF-8");
+            InputStream res = new URL(url.trim()).openStream();
+            BufferedReader rd = new BufferedReader(new InputStreamReader(res, Charset.forName("UTF-8")));
+
+            StringBuilder sb = new StringBuilder();
+            int cp;
+            while ((cp = rd.read()) != -1) {
+                sb.append((char) cp);
+            }
+            String response = sb.toString();
+            res.close();
+			boolean result = false;
+			if(response.equals("1"))
+			 result = true;
+
+			 return result;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
