@@ -136,7 +136,7 @@ public class LoginTag extends ZimbraSimpleTag {
             PageContext pageContext = (PageContext) jctxt;
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 
-            if(request.getParameter("g-recaptcha-response")!= null && !isCaptchaValid("6LdfLE0UAAAAAC3rf4G4oepXp7H0AEEegdfeDvUA", request.getParameter("g-recaptcha-response"))){
+            if(request.getParameter("captchaId") != null  && request.getParameter("captchaInput") != null && !isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))){
                 throw AuthFailedServiceException.INVALID_CAPTCHA();
             }
 
@@ -290,11 +290,11 @@ public class LoginTag extends ZimbraSimpleTag {
         }
     }
 
-    public static boolean isCaptchaValid(String secretKey, String response) {
+    public static boolean isCaptchaValid(String captchaId, String captchaInput) {
         try {
-            String url = "https://www.google.com/recaptcha/api/siteverify?"
-                    + "secret=" + URLEncoder.encode(secretKey, "UTF-8")
-                    + "&response=" + URLEncoder.encode(response, "UTF-8");
+            String url = "http://localhost:8666/verifyCaptcha?"
+                    + "captchaId=" + URLEncoder.encode(captchaId, "UTF-8")
+                    + "&captchaInput=" + URLEncoder.encode(captchaInput, "UTF-8");
             InputStream res = new URL(url.trim()).openStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(res, Charset.forName("UTF-8")));
 
@@ -303,11 +303,13 @@ public class LoginTag extends ZimbraSimpleTag {
             while ((cp = rd.read()) != -1) {
                 sb.append((char) cp);
             }
-            String jsonText = sb.toString();
+            String response = sb.toString();
             res.close();
+			boolean result = false;
+			if(response.equals("1"))
+			 result = true;
 
-            JSONObject json = new JSONObject(jsonText);
-            return json.getBoolean("success");
+			 return result;
         } catch (Exception e) {
             return false;
         }
