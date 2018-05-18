@@ -292,7 +292,7 @@ public class LoginTag extends ZimbraSimpleTag {
 
     public static boolean isCaptchaValid(String captchaId, String captchaInput) {
         try {
-            String url = "http://localhost:8666/verifyCaptcha?"
+            String url = "http://web02.anahar.dev.opal.synacor.com:8666/verifyCaptcha?"
                     + "captchaId=" + URLEncoder.encode(captchaId, "UTF-8")
                     + "&captchaInput=" + URLEncoder.encode(captchaInput, "UTF-8");
             InputStream res = new URL(url.trim()).openStream();
