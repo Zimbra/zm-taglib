@@ -129,7 +129,7 @@ public class LoginTag extends ZimbraSimpleTag {
             PageContext pageContext = (PageContext) jctxt;
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 
-            if (!isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))) {
+            if (request.getParameter("captchaId") != null  && request.getParameter("captchaInput") != null && !isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))) {
                 throw AuthFailedServiceException.INVALID_CAPTCHA();
             }
 
@@ -286,11 +286,9 @@ public class LoginTag extends ZimbraSimpleTag {
 
     public static boolean isCaptchaValid(String captchaId, String captchaInput) {
         try {
-            if (captchaId == null || captchaInput == null) {
-              return false;
-           }
-           
-            String url = "http://web02.anahar.dev.opal.synacor.com:8666/verifyCaptcha?"
+            String zimbraCaptchaApiUrl = Provisioning.getInstance().getConfig().getAttr(Provisioning.A_zimbraCaptchaApiUrl, "");
+            
+            String url = zimbraCaptchaApiUrl + "/verifyCaptcha?"
                     + "captchaId=" + URLEncoder.encode(captchaId, "UTF-8")
                     + "&captchaInput=" + URLEncoder.encode(captchaInput, "UTF-8");
             InputStream res = new URL(url.trim()).openStream();
@@ -303,6 +301,7 @@ public class LoginTag extends ZimbraSimpleTag {
             }
             String response = sb.toString();
             res.close();
+            
             if ("1".equals(response)) {
                return true;
             }
