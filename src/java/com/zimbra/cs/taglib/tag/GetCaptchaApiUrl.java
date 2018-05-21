@@ -38,7 +38,7 @@ public class GetCaptchaApiUrl extends ZimbraSimpleTag {
      * the importData param is set to true.
      */
     
-    public void setVarVirtualHost(String varCaptchaApiUrl) { this.mVarCaptchaApiUrl = varCaptchaApiUrl; }
+    public void setVarCaptchaApiUrl(String varCaptchaApiUrl) { this.mVarCaptchaApiUrl = varCaptchaApiUrl; }
     
 
     @Override
