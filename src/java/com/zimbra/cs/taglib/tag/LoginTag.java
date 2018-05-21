@@ -129,7 +129,7 @@ public class LoginTag extends ZimbraSimpleTag {
             PageContext pageContext = (PageContext) jctxt;
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 
-            if (!isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))){
+            if (!isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))) {
                 throw AuthFailedServiceException.INVALID_CAPTCHA();
             }
 
@@ -303,11 +303,10 @@ public class LoginTag extends ZimbraSimpleTag {
             }
             String response = sb.toString();
             res.close();
-			boolean result = false;
 			if ("1".equals(response)) {
-			  result = true;
+			  return true;
             }
-			return result;
+			return false;
         } catch (Exception e) {
             return false;
         }
