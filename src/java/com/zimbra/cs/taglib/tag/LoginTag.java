@@ -287,7 +287,7 @@ public class LoginTag extends ZimbraSimpleTag {
     public static boolean isCaptchaValid(String captchaId, String captchaInput) {
         try {
 		    if (captchaId == null || captchaInput == null) {
-			  result = true;
+			  result = false;
 			 }
 			
             String url = "http://web02.anahar.dev.opal.synacor.com:8666/verifyCaptcha?"
