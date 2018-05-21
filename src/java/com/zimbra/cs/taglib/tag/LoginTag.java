@@ -286,10 +286,10 @@ public class LoginTag extends ZimbraSimpleTag {
 
     public static boolean isCaptchaValid(String captchaId, String captchaInput) {
         try {
-		    if (captchaId == null || captchaInput == null) {
-			  result = false;
-			 }
-			
+            if (captchaId == null || captchaInput == null) {
+              return false;
+           }
+           
             String url = "http://web02.anahar.dev.opal.synacor.com:8666/verifyCaptcha?"
                     + "captchaId=" + URLEncoder.encode(captchaId, "UTF-8")
                     + "&captchaInput=" + URLEncoder.encode(captchaInput, "UTF-8");
@@ -303,10 +303,10 @@ public class LoginTag extends ZimbraSimpleTag {
             }
             String response = sb.toString();
             res.close();
-			if ("1".equals(response)) {
-			  return true;
+            if ("1".equals(response)) {
+               return true;
             }
-			return false;
+            return false;
         } catch (Exception e) {
             return false;
         }
