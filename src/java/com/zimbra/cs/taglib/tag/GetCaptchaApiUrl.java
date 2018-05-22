@@ -1,7 +1,7 @@
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Zimbra Collaboration Suite Server
- * Copyright (C) 2006, 2007, 2009, 2010, 2011, 2013, 2014, 2016 Synacor, Inc.
+ * Copyright (C) 2018 Synacor, Inc.
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software Foundation,
@@ -30,16 +30,8 @@ import com.zimbra.common.service.ServiceException;
 public class GetCaptchaApiUrl extends ZimbraSimpleTag {
 
     private String mVarCaptchaApiUrl;
-    
-    /**
-     * Signifies whether it is an admin proxy login ("View mail" login).
-     * If set to true, it is an admin login. Hence, do not invoke the import data
-     * request. If false, it is a normal user login, call import data request if
-     * the importData param is set to true.
-     */
-    
+
     public void setVarCaptchaApiUrl(String varCaptchaApiUrl) { this.mVarCaptchaApiUrl = varCaptchaApiUrl; }
-    
 
     @Override
     public void doTag() throws JspException, IOException {
