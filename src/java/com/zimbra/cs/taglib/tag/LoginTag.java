@@ -130,7 +130,7 @@ public class LoginTag extends ZimbraSimpleTag {
             PageContext pageContext = (PageContext) jctxt;
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
 
-            if(request.getParameter("g-recaptcha-response")!= null && !isCaptchaValid("6LdfLE0UAAAAAC3rf4G4oepXp7H0AEEegdfeDvUA", request.getParameter("g-recaptcha-response"))){
+            if (request.getParameter("captchaId") != null  && request.getParameter("captchaInput") != null && !isCaptchaValid(request.getParameter("captchaId"), request.getParameter("captchaInput"))) {
                 throw AuthFailedServiceException.INVALID_CAPTCHA();
             }
 
@@ -166,7 +166,7 @@ public class LoginTag extends ZimbraSimpleTag {
 
                     // check if user domain matches current virtual host.
                     if (!virtualHost.equals(usernameSplit[1])) {
-                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, "", "Invalid username for virtual host = ".concat(virtualHost));
+                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, "", "Invalid username for host = ".concat(virtualHost));
                     }
                 }
                 options.setAccount(mUsername);
@@ -291,11 +291,13 @@ public class LoginTag extends ZimbraSimpleTag {
         }
     }
 
-    public static boolean isCaptchaValid(String secretKey, String response) {
+    public static boolean isCaptchaValid(String captchaId, String captchaInput) {
         try {
-            String url = "https://www.google.com/recaptcha/api/siteverify?"
-                    + "secret=" + URLEncoder.encode(secretKey, "UTF-8")
-                    + "&response=" + URLEncoder.encode(response, "UTF-8");
+            String zimbraCaptchaApiUrl = Provisioning.getInstance().getConfig().getAttr(Provisioning.A_zimbraCaptchaApiUrl, "");
+            
+            String url = zimbraCaptchaApiUrl + "/verifyCaptcha?"
+                    + "captchaId=" + URLEncoder.encode(captchaId, "UTF-8")
+                    + "&captchaInput=" + URLEncoder.encode(captchaInput, "UTF-8");
             InputStream res = new URL(url.trim()).openStream();
             BufferedReader rd = new BufferedReader(new InputStreamReader(res, Charset.forName("UTF-8")));
 
@@ -304,11 +306,13 @@ public class LoginTag extends ZimbraSimpleTag {
             while ((cp = rd.read()) != -1) {
                 sb.append((char) cp);
             }
-            String jsonText = sb.toString();
+            String response = sb.toString();
             res.close();
-
-            JSONObject json = new JSONObject(jsonText);
-            return json.getBoolean("success");
+            
+            if ("1".equals(response)) {
+               return true;
+            }
+            return false;
         } catch (Exception e) {
             return false;
         }
