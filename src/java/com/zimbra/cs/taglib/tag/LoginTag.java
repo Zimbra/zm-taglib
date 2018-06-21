@@ -166,7 +166,7 @@ public class LoginTag extends ZimbraSimpleTag {
 
                     Domain currentDomainObj = Provisioning.getInstance().getDomainByVirtualHostname(virtualHost);
                     if (currentDomainObj == null) {
-                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, virtualHost.concat(" virtual domain does not exist"));
+                        throw AuthFailedServiceException.AUTH_FAILED(mUsername, "", virtualHost.concat(" virtual domain does not exist"));
                     }
 
                     String currentDomainName = currentDomainObj.getDomainName();
