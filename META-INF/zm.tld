@@ -1079,6 +1079,27 @@
     </tag>
     <tag>
         <description>
+            This tag is to fetch the login history API url endpoint.
+        </description>
+        <name>getLoginHistoryApiUrl</name>
+        <tag-class>com.zimbra.cs.taglib.tag.GetLoginHistoryApiUrl</tag-class>
+        <body-content>empty</body-content>
+        <variable>
+            <name-from-attribute>varHistoryApiUrl</name-from-attribute>
+            <variable-class>java.lang.String</variable-class>
+            <scope>AT_END</scope>
+        </variable>
+        <attribute>
+            <description>
+                HistoryApiUrl
+            </description>
+            <name>varHistoryApiUrl</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+    <tag>
+        <description>
             login tag. Does an AuthRequest and establishes session/cookie. Either username/password or
             authtoken must be specified.
         </description>
