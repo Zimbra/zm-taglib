@@ -188,6 +188,7 @@ public class LoginTag extends ZimbraSimpleTag {
             if (mDeviceId != null) {
                 options.setDeviceId(mDeviceId);
             }
+            options.setOriginalUserAgent(request.getHeader("User-Agent"));
             ZMailbox mbox = ZMailbox.getMailbox(options);
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 

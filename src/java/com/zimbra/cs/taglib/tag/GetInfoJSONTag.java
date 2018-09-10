@@ -18,6 +18,7 @@ package com.zimbra.cs.taglib.tag;
 
 import java.io.IOException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
@@ -63,14 +64,17 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
         try {
             JspContext ctxt = getJspContext();
             PageContext pageContext = (PageContext) ctxt;
+            HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
             String url = ZJspSession.getSoapURL(pageContext);
             String remoteAddr = ZJspSession.getRemoteAddr(pageContext);
+            String originalUserAgent = request.getHeader("User-Agent");
             if (mFolderPath!=null && !mFolderPath.isEmpty()) {
                 ZMailbox.Options options = new ZMailbox.Options();
                 options.setClientIp(ZJspSession.getRemoteAddr(pageContext));
                 options.setNoSession(true);
                 options.setAuthToken(mAuthToken);
                 options.setAuthAuthToken(true);
+                options.setOriginalUserAgent(originalUserAgent);
                 options.setUri(url);
                 // We should already have a csrf token; no need to request again
                 ZMailbox mbox = ZMailbox.getMailbox(options);
@@ -80,7 +84,8 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
                     mSortBy = this.getSortByAttr(folderId, mSortBy);
                 }
             }
-            Element e = getBootstrapJSON(url, remoteAddr, mAuthToken, mCsrfToken, mDoSearch, mItemsPerPage, mTypes, mSortBy, mFullConversation);
+            Element e = getBootstrapJSON(url, remoteAddr, mAuthToken, mCsrfToken, originalUserAgent,
+                mDoSearch, mItemsPerPage, mTypes, mSortBy, mFullConversation);
             ctxt.setAttribute(mVar, e.toString(),  PageContext.REQUEST_SCOPE);
         } catch (ServiceException e) {
             throw new JspTagException(e.getMessage(), e);
@@ -99,8 +104,11 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
      * @return top-level JSON respsonse
      * @throws ServiceException on error
      */
-    public static Element getBootstrapJSON(String url, String remoteAddr, ZAuthToken authToken, boolean doSearch, String itemsPerPage, String searchTypes, String sortBy, boolean fullConversation) throws ServiceException {
-        return getBootstrapJSON(url, remoteAddr, authToken, null, doSearch, itemsPerPage, searchTypes, sortBy, fullConversation);
+    public static Element getBootstrapJSON(String url, String remoteAddr, ZAuthToken authToken,
+        boolean doSearch, String itemsPerPage, String searchTypes, String sortBy,
+        boolean fullConversation) throws ServiceException {
+        return getBootstrapJSON(url, remoteAddr, authToken, null, doSearch, itemsPerPage,
+            searchTypes, sortBy, fullConversation);
     }
 
     /**
@@ -116,10 +124,33 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
      * @return top-level JSON respsonse
      * @throws ServiceException on error
      */
-    public static Element getBootstrapJSON(String url, String remoteAddr, ZAuthToken authToken, String csrfToken, boolean doSearch, String itemsPerPage, String searchTypes, String sortBy, boolean fullConversation) throws ServiceException {
+    public static Element getBootstrapJSON(String url, String remoteAddr, ZAuthToken authToken,
+        String csrfToken, boolean doSearch, String itemsPerPage, String searchTypes, String sortBy,
+        boolean fullConversation) throws ServiceException {
+        return getBootstrapJSON(url, remoteAddr, authToken, csrfToken, null, doSearch, itemsPerPage,
+            searchTypes, sortBy, fullConversation);
+    }
+
+    /**
+     * used when bootstrapping AJAX client.
+     *
+     * @param url url to connect to
+     * @param authToken auth token to use
+     * @param csrfToken csrf token
+     * @param originalUserAgent the original user-agent header
+     * @param itemsPerPage number of search items to return
+     * @param doSearch whether or not to also do the intial search
+     * @param searchTypes what to search for
+     * @param sortBy how to sort search
+     * @return top-level JSON respsonse
+     * @throws ServiceException on error
+     */
+    public static Element getBootstrapJSON(String url, String remoteAddr, ZAuthToken authToken,
+        String csrfToken, String originalUserAgent, boolean doSearch, String itemsPerPage,
+        String searchTypes, String sortBy, boolean fullConversation) throws ServiceException {
         JsonDebugListener debug = new JsonDebugListener();
         SoapTransport transport = TagUtil.newJsonTransport(url, remoteAddr, authToken, csrfToken, debug);
-
+        transport.setOriginalUserAgent(originalUserAgent);
         try {
             Element batch = Element.create(SoapProtocol.SoapJS, ZimbraNamespace.E_BATCH_REQUEST);
             Element getInfoRequest = batch.addElement(AccountConstants.GET_INFO_REQUEST);
