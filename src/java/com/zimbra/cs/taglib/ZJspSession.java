@@ -477,10 +477,14 @@ public class ZJspSession {
 
         HttpServletRequest request= (HttpServletRequest) context.getRequest();
         ZAuthToken zat = new ZAuthToken(request, false);
-        if (zat.isEmpty())
-            return null;
-        else
+        if (!zat.isEmpty()) {
             return zat;
+        }
+        zat = new ZAuthToken((String) request.getParameter(Q_ZAUTHTOKEN));
+        if (!zat.isEmpty()) {
+            return zat;
+        }
+        return null;
     }
 
     public static boolean hasSession(PageContext context) {

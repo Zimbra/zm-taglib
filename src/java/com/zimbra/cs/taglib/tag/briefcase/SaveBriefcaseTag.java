@@ -16,22 +16,23 @@
  */
 package com.zimbra.cs.taglib.tag.briefcase;
 
-import com.zimbra.cs.taglib.tag.ZimbraSimpleTag;
-import com.zimbra.cs.taglib.bean.ZMessageComposeBean;
-import com.zimbra.cs.taglib.bean.ZMessageBean;
-import com.zimbra.client.ZMailbox;
-import com.zimbra.common.service.ServiceException;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspContext;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.JspTagException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.servlet.jsp.JspContext;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspTagException;
+import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
+
+import com.zimbra.client.ZMailbox;
+import com.zimbra.common.service.ServiceException;
+import com.zimbra.cs.taglib.bean.ZMessageBean;
+import com.zimbra.cs.taglib.bean.ZMessageComposeBean;
+import com.zimbra.cs.taglib.tag.ZimbraSimpleTag;
 
 public class SaveBriefcaseTag extends ZimbraSimpleTag {
 
@@ -47,6 +48,7 @@ public class SaveBriefcaseTag extends ZimbraSimpleTag {
     public void setFolderId(String folderId) { mFolderId = folderId; }
     public void setVar(String var) { this.mVar = var; }
 
+    @Override
     public void doTag() throws JspException, IOException {
         JspContext jctxt = getJspContext();
         PageContext pc = (PageContext) jctxt;
@@ -65,18 +67,24 @@ public class SaveBriefcaseTag extends ZimbraSimpleTag {
                 int i=0;
                 try {
                     for (FileItem item : mFileItems) {
-                        if (item.getSize() > 0 ) {
-                            Part part = new FilePart(item.getFieldName(), new ZMessageComposeBean.UploadPartSource(item), item.getContentType(), "utf-8");
-                            String attachmentUploadId = mbox.uploadAttachments(new Part[] { part }, 1000 * 60);
-                            briefIds[i++] = mbox.createDocument(mFolderId, item.getName(), attachmentUploadId);
+                        if (item.getSize() > 0) {
+                            Map<String, byte[]> attachment = new HashMap<String, byte[]>();
+                            attachment.put(item.getName(), item.get());
+                            String attachmentUploadId = mbox.uploadAttachments(attachment,
+                                1000 * 60);
+                            briefIds[i++] = mbox.createDocument(mFolderId, item.getName(),
+                                attachmentUploadId);
                         }
                     }
                 } finally {
                     for (FileItem item : mFileItems) {
-                        try { item.delete(); } catch (Exception e) { /* TODO: need logging infra */ }
+                        try {
+                            item.delete();
+                        } catch (Exception e) {
+                            /* TODO: need logging infra */ }
                     }
                 }
-                
+
                 jctxt.setAttribute(mVar, briefIds, PageContext.PAGE_SCOPE);
             }
         } catch (ServiceException e) {
