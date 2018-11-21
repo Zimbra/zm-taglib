@@ -119,6 +119,10 @@ public class ZMessageBean {
     /** @return if raw is specified and message too big or not ASCII, a content servlet URL is returned */
     public String getContentURL() { return mMsg.getContentURL(); }
 
+    public String getSubjectFontSize() { return mMsg.getSubjectFontSize(); }
+
+    public String getLocationFontSize() { return mMsg.getLocationFontSize(); }
+
     private ZMimePart getBody(ZMimePart mp) {
         if (mp == null) return null;
         else if (mp.isBody()) return mp;
