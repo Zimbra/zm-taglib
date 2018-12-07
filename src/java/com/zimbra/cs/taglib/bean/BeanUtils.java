@@ -682,7 +682,7 @@ public class BeanUtils {
 
     public static ZFolderBean getFolder(PageContext pc, String id) throws JspException, ServiceException {
         ZMailbox mbox = ZJspSession.getZMailbox(pc);
-        if (id == null) return null;
+        if (id == null || id.isEmpty()) return null;
         ZFolder f = mbox.getFolderById(id);
         if (f == null) {
             try {
@@ -709,7 +709,7 @@ public class BeanUtils {
      */
     public static String getFolderName(PageContext pc, String id) throws JspException, ServiceException {
         ZMailbox mbox = ZJspSession.getZMailbox(pc);
-        if (id == null) return null;
+        if (id == null || id.isEmpty()) return null;
         ZFolder f = mbox.getFolderById(id);
         if (f == null) return null;
         String lname = I18nUtil.getLocalizedMessage(pc, "FOLDER_LABEL_"+f.getId());
