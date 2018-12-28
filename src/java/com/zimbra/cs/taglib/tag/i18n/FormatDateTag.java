@@ -88,6 +88,11 @@ public class FormatDateTag extends SimpleTagSupport  {
 
 		// create formatter
 		Locale locale = I18nUtil.findLocale(pageContext);
+
+		// fix for hindi, since "hi" is not a valid language locale for Java.
+		// no current fix for tamil, since Java does not have a tamil locale
+		if (locale.getLanguage() == "hi") locale = new Locale("hi", "IN");
+
 		DateFormat formatter = this.pattern != null ? new SimpleDateFormat(this.pattern, locale) : null;
 		if (formatter == null) {
 			int dateStyle = I18nUtil.getStyle(this.dateStyle);
