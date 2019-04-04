@@ -42,6 +42,7 @@ import com.zimbra.common.util.HttpUtil;
 import com.zimbra.common.util.WebSplitUtil;
 import com.zimbra.common.util.ZimbraCookie;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
+import com.zimbra.cs.account.AccountServiceException;
 import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.account.Domain;
 import com.zimbra.cs.taglib.ZJspSession;
