@@ -16,20 +16,23 @@
  */
 package com.zimbra.cs.taglib.tag.briefcase;
 
-import com.zimbra.cs.taglib.tag.ZimbraSimpleTag;
-import com.zimbra.cs.taglib.bean.ZMessageComposeBean;
-import com.zimbra.cs.taglib.bean.ZMessageBean;
-import com.zimbra.client.ZMailbox;
-import com.zimbra.common.service.ServiceException;
-
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspContext;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.JspTagException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.jsp.JspContext;
+import javax.servlet.jsp.JspException;
+import javax.servlet.jsp.JspTagException;
+import javax.servlet.jsp.PageContext;
+
+import org.apache.commons.fileupload.FileItem;
+
+import com.zimbra.client.ZMailbox;
+import com.zimbra.common.service.ServiceException;
+import com.zimbra.cs.taglib.bean.ZMessageBean;
+import com.zimbra.cs.taglib.bean.ZMessageComposeBean;
+import com.zimbra.cs.taglib.tag.ZimbraSimpleTag;
 
 public class SaveBriefcaseTag extends ZimbraSimpleTag {
 
@@ -45,6 +48,7 @@ public class SaveBriefcaseTag extends ZimbraSimpleTag {
     public void setFolderId(String folderId) { mFolderId = folderId; }
     public void setVar(String var) { this.mVar = var; }
 
+    @Override
     public void doTag() throws JspException, IOException {
         JspContext jctxt = getJspContext();
         PageContext pc = (PageContext) jctxt;
@@ -75,7 +79,7 @@ public class SaveBriefcaseTag extends ZimbraSimpleTag {
                         try { item.delete(); } catch (Exception e) { /* TODO: need logging infra */ }
                     }
                 }
-                
+
                 jctxt.setAttribute(mVar, briefIds, PageContext.PAGE_SCOPE);
             }
         } catch (ServiceException e) {
