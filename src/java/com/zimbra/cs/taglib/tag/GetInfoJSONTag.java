@@ -24,6 +24,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 
+import com.zimbra.client.ZFolder;
+import com.zimbra.client.ZMailbox;
 import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.soap.AccountConstants;
@@ -36,8 +38,6 @@ import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.common.zclient.ZClientException;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.cs.taglib.tag.TagUtil.JsonDebugListener;
-import com.zimbra.client.ZFolder;
-import com.zimbra.client.ZMailbox;
 
 public class GetInfoJSONTag extends ZimbraSimpleTag {
 
@@ -60,7 +60,8 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
     public void setFolderpath(String folderPath) {mFolderPath = folderPath; }
     public void setSortby(String sortBy) {mSortBy = sortBy; }
 	public void setFullconversation(boolean fullConversation) { mFullConversation = fullConversation; }
-	public void doTag() throws JspException {
+	@Override
+    public void doTag() throws JspException {
         try {
             JspContext ctxt = getJspContext();
             PageContext pageContext = (PageContext) ctxt;
@@ -74,7 +75,7 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
                 options.setNoSession(true);
                 options.setAuthToken(mAuthToken);
                 options.setAuthAuthToken(true);
-                options.setOriginalUserAgent(originalUserAgent);
+                options.setUserAgent(originalUserAgent, SoapProtocol.Soap12.getVersion());
                 options.setUri(url);
                 // We should already have a csrf token; no need to request again
                 ZMailbox mbox = ZMailbox.getMailbox(options);
@@ -150,7 +151,8 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
         String searchTypes, String sortBy, boolean fullConversation) throws ServiceException {
         JsonDebugListener debug = new JsonDebugListener();
         SoapTransport transport = TagUtil.newJsonTransport(url, remoteAddr, authToken, csrfToken, debug);
-        transport.setOriginalUserAgent(originalUserAgent);
+        transport.setUserAgent(originalUserAgent, SoapProtocol.Soap12.getVersion());
+
         try {
             Element batch = Element.create(SoapProtocol.SoapJS, ZimbraNamespace.E_BATCH_REQUEST);
             Element getInfoRequest = batch.addElement(AccountConstants.GET_INFO_REQUEST);
