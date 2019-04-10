@@ -75,7 +75,7 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
                 options.setNoSession(true);
                 options.setAuthToken(mAuthToken);
                 options.setAuthAuthToken(true);
-                options.setUserAgent(originalUserAgent, SoapProtocol.Soap12.getVersion());
+                options.setOriginalUserAgent(originalUserAgent);
                 options.setUri(url);
                 // We should already have a csrf token; no need to request again
                 ZMailbox mbox = ZMailbox.getMailbox(options);
@@ -151,7 +151,7 @@ public class GetInfoJSONTag extends ZimbraSimpleTag {
         String searchTypes, String sortBy, boolean fullConversation) throws ServiceException {
         JsonDebugListener debug = new JsonDebugListener();
         SoapTransport transport = TagUtil.newJsonTransport(url, remoteAddr, authToken, csrfToken, debug);
-        transport.setUserAgent(originalUserAgent, SoapProtocol.Soap12.getVersion());
+        transport.setOriginalUserAgent(originalUserAgent);
 
         try {
             Element batch = Element.create(SoapProtocol.SoapJS, ZimbraNamespace.E_BATCH_REQUEST);

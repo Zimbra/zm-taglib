@@ -16,25 +16,25 @@
  */
 package com.zimbra.cs.taglib.bean;
 
-import com.zimbra.common.service.ServiceException;
-import com.zimbra.client.ZMailbox;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadBase;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.*;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspTagException;
-import javax.servlet.jsp.PageContext;
-import java.io.UnsupportedEncodingException;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.JspTagException;
+import javax.servlet.jsp.PageContext;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+
+import com.zimbra.client.ZMailbox;
+import com.zimbra.common.service.ServiceException;
 
 public class ZFileUploaderBean {
 
@@ -160,7 +160,7 @@ public class ZFileUploaderBean {
         // TODO: get from config,
         DiskFileItemFactory dfif = new DiskFileItemFactory();
         ServletFileUpload upload;
-        
+
         dfif.setSizeThreshold(32 * 1024);
         dfif.setRepository(new File(getTempDirectory()));
         upload = new ServletFileUpload(dfif);
@@ -171,13 +171,13 @@ public class ZFileUploaderBean {
     private static String getTempDirectory() {
     	return System.getProperty("java.io.tmpdir", "/tmp");
     }
-    
+
     public String getUploadId(ZMailbox mailbox) throws ServiceException {
         if (!mFiles.isEmpty()) {
             Map<String,byte[]> attachments = new HashMap<String,byte[]>();
             int i=0;
             for (FileItem item : mFiles) {
-            	 attachments.put(item.getName(),item.get());
+                attachments.put(item.getName(), item.get());
             }
             try {
                 return mailbox.uploadAttachments(attachments, 1000*60); //TODO get timeout from config

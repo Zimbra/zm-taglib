@@ -67,16 +67,21 @@ public class SaveBriefcaseTag extends ZimbraSimpleTag {
                 int i=0;
                 try {
                     for (FileItem item : mFileItems) {
-                        if (item.getSize() > 0 ) {
-                        	Map<String,byte[]> attachment = new HashMap<String,byte[]>();
-                        	attachment.put(item.getName(),item.get());
-                            String attachmentUploadId = mbox.uploadAttachments(attachment, 1000 * 60);
-                            briefIds[i++] = mbox.createDocument(mFolderId, item.getName(), attachmentUploadId);
+                        if (item.getSize() > 0) {
+                            Map<String, byte[]> attachment = new HashMap<String, byte[]>();
+                            attachment.put(item.getName(), item.get());
+                            String attachmentUploadId = mbox.uploadAttachments(attachment,
+                                1000 * 60);
+                            briefIds[i++] = mbox.createDocument(mFolderId, item.getName(),
+                                attachmentUploadId);
                         }
                     }
                 } finally {
                     for (FileItem item : mFileItems) {
-                        try { item.delete(); } catch (Exception e) { /* TODO: need logging infra */ }
+                        try {
+                            item.delete();
+                        } catch (Exception e) {
+                            /* TODO: need logging infra */ }
                     }
                 }
 
