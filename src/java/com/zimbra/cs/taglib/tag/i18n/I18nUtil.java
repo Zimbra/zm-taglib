@@ -21,6 +21,8 @@ import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.cs.taglib.ZJspSession;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.text.*;
 import javax.servlet.*;
@@ -499,6 +501,45 @@ public class I18nUtil {
     //
     // ClassLoader methods
     //
+    @Override
+    public URL getResource(String filename) {
+        if (ZimbraLog.webclient.isDebugEnabled()) {
+            ZimbraLog.webclient.debug("getResource: filename="+filename);
+        }
+
+        // default resource
+        String basename = filename.replaceAll("^/skins/[^/]+", "");
+        boolean isMsgOrKey = basename.startsWith("/messages/") || basename.startsWith("/keys/");
+        if (!isMsgOrKey) {
+            return super.getResource(filename);
+        }
+
+        // aggregated resources
+        URL resourceURL = super.getResource(basename);
+
+        String skin = (String)pageContext.getAttribute("skin");
+        if (skin == null) {
+            skin = this.setSkin(this.pageContext.getRequest(), this.pageContext.getResponse());
+        }
+
+        ZimbraLog.webclient.debug("omega:" + (this.pageContext.getServletContext().getRealPath("/skins/"+skin+basename)));
+
+        File file = new File(this.pageContext.getServletContext().getRealPath("/skins/"+skin+basename));
+        if (file.exists()) {
+            if (ZimbraLog.webclient.isDebugEnabled()) {
+                ZimbraLog.webclient.debug("  found message overrides for skin="+skin);
+            }
+            try {
+                resourceURL = file.toURI().toURL();
+            }
+            catch (MalformedURLException e) {
+                ZimbraLog.webclient.debug("MalformedURLException:" + e);
+            }
+        }
+        return resourceURL;
+    }
+
+    @Override
     public InputStream getResourceAsStream(String filename) {
         if (ZimbraLog.webclient.isDebugEnabled()) {
             ZimbraLog.webclient.debug("getResourceAsStream: filename="+filename);
@@ -545,7 +586,6 @@ public class I18nUtil {
                 ZimbraLog.webclient.debug("FileNotFoundException:" + e);
             }
         }
-
         return stream;
     }
 

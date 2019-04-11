@@ -37,10 +37,12 @@ import com.zimbra.client.ZAuthResult;
 import com.zimbra.client.ZMailbox;
 import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.service.ServiceException;
+import com.zimbra.common.soap.SoapFaultException;
 import com.zimbra.common.util.HttpUtil;
 import com.zimbra.common.util.WebSplitUtil;
 import com.zimbra.common.util.ZimbraCookie;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
+import com.zimbra.cs.account.AccountServiceException;
 import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.account.Domain;
 import com.zimbra.cs.taglib.ZJspSession;
@@ -188,9 +190,14 @@ public class LoginTag extends ZimbraSimpleTag {
                     String protocol = (ZJspSession.isProtocolModeHttps() ? "httpssl" : "http");
                     NginxAuthServer nginxLookUpServer = NginxRouteLookUpConnector.getClient().getRouteforAccount(mUsername, "username",
                             protocol, HttpUtil.getVirtualHost(request), request.getRemoteAddr(), request.getHeader("Virtual-Host"));
-                    // In case of https, protocol needs to be https for the URL and not httpssl as passed to getRouteforAccount
-                    protocol = (ZJspSession.isProtocolModeHttps() ? "https" : "http");
-                    mUrl = protocol + "://" + nginxLookUpServer.getNginxAuthServer() + "/service/soap";
+                    if (null == nginxLookUpServer) {
+                        throw new SoapFaultException("Nginx route lookup error: Authentication failed for [" + mUsername + "]",
+                                AccountServiceException.AUTH_FAILED, false, null);
+                    } else {
+                        // In case of https, protocol needs to be https for the URL and not httpssl as passed to getRouteforAccount
+                        protocol = (ZJspSession.isProtocolModeHttps() ? "https" : "http");
+                        mUrl = protocol + "://" + nginxLookUpServer.getNginxAuthServer() + "/service/soap";
+                    }
                 } else {
                     mUrl = ZJspSession.getSoapURL(pageContext);
                 }
@@ -213,6 +220,7 @@ public class LoginTag extends ZimbraSimpleTag {
             if (mDeviceId != null) {
                 options.setDeviceId(mDeviceId);
             }
+            options.setOriginalUserAgent(request.getHeader("User-Agent"));
             ZMailbox mbox = ZMailbox.getMailbox(options);
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 
