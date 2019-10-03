@@ -36,10 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.PageContext;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.StringPart;
-import org.apache.commons.httpclient.methods.multipart.Part;
-import org.apache.commons.httpclient.methods.multipart.PartSource;
 
 import com.zimbra.common.calendar.ParsedDuration;
 import com.zimbra.common.calendar.TZIDMapper;
@@ -2078,7 +2074,7 @@ da body
             for (FileItem item : mFileItems) {
                 if (item.getSize() > 0) num++;
             }
-            Part[] parts = new Part[num*3];
+            Map<String,byte[]> attachments = new HashMap<String,byte[]>();
             int i=0;
             int j=0;
             for (FileItem item : mFileItems) {
@@ -2091,16 +2087,13 @@ da body
                         e.printStackTrace();
                         name = item.getName();
                     }
-
-                    parts[i++] = new StringPart("_charset_", "UTF-8","UTF-8");
-                    parts[i++] = new StringPart("filename"+j++, name,"UTF-8");
-                    parts[i++] = new FilePart(item.getFieldName(), new UploadPartSource(item), item.getContentType(), "UTF-8");
+                    attachments.put(name, item.get());
                 }
             }
 
             try {
-                if(parts.length > 0) {
-                    attachmentUploadId = mailbox.uploadAttachments(parts, 1000 * 60);  //TODO get timeout from config
+                if(attachments.size() > 0) {
+                    attachmentUploadId = mailbox.uploadAttachments(attachments, 1000 * 60);  //TODO get timeout from config
                 }
             } finally {
                 for (FileItem item : mFileItems) {
@@ -2118,24 +2111,5 @@ da body
         }
         m.setAttachmentUploadId(attachmentUploadId);
         return m;
-    }
-
-    public static class UploadPartSource implements PartSource {
-
-        private FileItem mItem;
-
-        public UploadPartSource(FileItem item) { mItem = item; }
-
-        public long getLength() {
-            return mItem.getSize();
-        }
-
-        public String getFileName() {
-            return mItem.getName();
-        }
-
-        public InputStream createInputStream() throws IOException {
-            return mItem.getInputStream();
-        }
     }
 }
