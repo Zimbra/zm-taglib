@@ -18,6 +18,7 @@ package com.zimbra.cs.taglib.tag;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,15 +29,27 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 
 import com.zimbra.client.ZAuthResult;
+import com.zimbra.client.ZGetInfoResult;
 import com.zimbra.client.ZMailbox;
+import com.zimbra.common.account.Key;
+import com.zimbra.common.account.ZAttrProvisioning;
+import com.zimbra.common.account.ZAttrProvisioning.DelayedIndexStatus;
 import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.soap.SoapFaultException;
 import com.zimbra.common.util.HttpUtil;
 import com.zimbra.common.util.WebSplitUtil;
 import com.zimbra.common.util.ZimbraCookie;
+import com.zimbra.common.util.ZimbraLog;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
+import com.zimbra.cs.account.Account;
 import com.zimbra.cs.account.AccountServiceException;
+import com.zimbra.cs.account.AuthToken;
+import com.zimbra.cs.account.AuthTokenException;
+import com.zimbra.cs.account.Provisioning.CacheEntry;
+import com.zimbra.cs.account.ZimbraAuthToken;
+import com.zimbra.cs.account.soap.SoapProvisioning;
+import com.zimbra.cs.account.soap.SoapProvisioning.ManageIndexType;
 import com.zimbra.cs.taglib.bean.BeanUtils;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.cs.taglib.ngxlookup.NginxRouteLookUpConnector;
@@ -241,6 +254,37 @@ public class LoginTag extends ZimbraSimpleTag {
                 boolean importDataOnLoginAttr = mbox.getFeatures().getDataSourceImportOnLogin();
                 if (mImportData && !mAdminPreAuth && importDataOnLoginAttr) {
                     mbox.importData(mbox.getAllDataSources());
+                }
+
+                try {
+                    /* zimbraDelayedIndexStatus always needs to be loaded from ldap
+                     * because it is updated on /service app but LoginTag runs on /zimbra app
+                     */
+                    ZGetInfoResult accountInfo = mbox.getAccountInfo(true);
+                    boolean delayedIndexEnabled = accountInfo.getFeatures().getBool(ZAttrProvisioning.A_zimbraFeatureDelayedIndexEnabled);
+                    List<String> list = accountInfo.getAttrs().get(ZAttrProvisioning.A_zimbraDelayedIndexStatus);
+                    DelayedIndexStatus delayedIndexStatus = (list == null || list.isEmpty()) ? DelayedIndexStatus.suppressed : DelayedIndexStatus.fromString(list.get(0));
+                    AuthToken token = ZimbraAuthToken.getAuthToken(mbox.getAuthToken().getValue());
+                    String adminAcct = token.getAdminAccountId();
+                    if (adminAcct != null
+                            && delayedIndexEnabled
+                            && DelayedIndexStatus.suppressed.equals(delayedIndexStatus)) {
+                        Account acct = token.getAccount();
+                        acct.setDelayedIndexStatus(DelayedIndexStatus.waitingForSearch);
+                        SoapProvisioning sp = SoapProvisioning.getAdminInstance();
+                        CacheEntry[] entries = new CacheEntry[1];
+                        entries[0] = new CacheEntry(Key.CacheEntryBy.id, token.getAccountId());
+                        sp.flushCache("account", entries, true);
+                        ZimbraLog.index.info("Set zimbraDelayedIndexStatus to waitingForSearch and FlushCache account " + acct.getName() + " on all servers");
+                    } else if (adminAcct == null
+                            && delayedIndexEnabled
+                            && !DelayedIndexStatus.indexing.equals(delayedIndexStatus)) {
+                        Account acct = token.getAccount();
+                        SoapProvisioning sp = SoapProvisioning.getAdminInstance();
+                        sp.manageIndex(acct, ManageIndexType.enableIndexing);
+                    }
+                } catch (AuthTokenException e) {
+                    ZimbraLog.mailbox.warn("DelayedIndex check failed at login");
                 }
             }
 
