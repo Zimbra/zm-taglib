@@ -14,12 +14,12 @@
   <dependency org="org.apache.httpcomponents" name="httpmime" rev="${httpclient.version}"/>
   <dependency org="com.google.guava" name="guava" rev="${com.google.guava.version}" />
   <dependency org="com.yahoo.platform.yui" name="yuicompressor" rev="2.4.8" />
-  <dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" />
+  <dependency org="commons-fileupload" name="commons-fileupload" rev="1.4" />
   <dependency org="javax.mail" name="mail" rev="1.4.5" />
   <dependency org="net.spy" name="spymemcached" rev="2.12.1" transitive="false"/>
   <dependency org="org.eclipse.jetty" name="jetty-io" rev="9.3.5.v20151012" />
   <dependency org="org.json" name="json" rev="20090211" />
-  <dependency org="dom4j" name="dom4j" rev="1.5.2" />
+  <dependency org="org.dom4j" name="dom4j" rev="${dom4j.version}" />
   <dependency org="zimbra" name="zm-client" rev="latest.integration" />
   <dependency org="zimbra" name="zm-common" rev="latest.integration" />
   <dependency org="zimbra" name="zm-soap" rev="latest.integration" />
