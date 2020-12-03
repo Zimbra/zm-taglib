@@ -6918,7 +6918,23 @@
             <rtexprvalue>true</rtexprvalue>
         </attribute>
     </tag>
-    
+
+    <tag>
+        <description>
+            throw an exception if zimbraFeatureWebClientEnabled is FALSE
+        </description>
+        <name>checkWebClientEnabled</name>
+        <tag-class>com.zimbra.cs.taglib.tag.CheckWebClientEnabledTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>ZMailboxBean object to use</description>
+            <name>box</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>com.zimbra.cs.taglib.bean.ZMailboxBean</type>
+        </attribute>
+    </tag>
+
 	<!-- These tags are copied from jstl.tld because we implement our own
 	     versions but want to keep API compatibility. -->
 	<!--
