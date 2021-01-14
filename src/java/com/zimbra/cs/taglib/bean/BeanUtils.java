@@ -24,6 +24,7 @@ import com.zimbra.common.util.StringUtil;
 import com.zimbra.common.soap.VoiceConstants;
 import com.zimbra.common.mailbox.ContactConstants;
 import com.zimbra.common.mime.shim.JavaMailInternetAddress;
+import com.zimbra.cs.account.AccountServiceException;
 import com.zimbra.cs.service.util.ItemId;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.client.ZFilterAction.ZDiscardAction;
@@ -1903,6 +1904,12 @@ public class BeanUtils {
     public static String capitalize(String s) {
         if (s == null || s.length() == 0) return "";
         return s.length() > 1 ? s.substring(0,1).toUpperCase()+s.substring(1) : s.toUpperCase();
+    }
+
+    public static void checkWebClientEnabled(ZMailbox mbox) throws ServiceException {
+        if (!mbox.getFeatures().getWebClientEnabled()) {
+            throw AccountServiceException.WEB_CLIENT_ACCESS_NOT_ALLOWED(mbox.getName());
+        }
     }
 }
 
