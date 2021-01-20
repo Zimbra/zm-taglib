@@ -198,7 +198,10 @@ public class LoginTag extends ZimbraSimpleTag {
             }
             options.setOriginalUserAgent(request.getHeader("User-Agent"));
             ZMailbox mbox = ZMailbox.getMailbox(options);
-            BeanUtils.checkWebClientEnabled(mbox);
+            ZAuthResult authResult = mbox.getAuthResult();
+            if (!authResult.getTwoFactorAuthRequired()) {
+                BeanUtils.checkWebClientEnabled(mbox);
+            }
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 
             String refer = mbox.getAuthResult().getRefer();
@@ -213,7 +216,7 @@ public class LoginTag extends ZimbraSimpleTag {
                         mbox.getAuthResult().getExpires());
             }
 
-            ZAuthResult authResult = mbox.getAuthResult();
+            
             if (authResult.getTrustedToken() != null) {
                 setTrustedCookie(response,
                         authResult.getTrustedToken(),
