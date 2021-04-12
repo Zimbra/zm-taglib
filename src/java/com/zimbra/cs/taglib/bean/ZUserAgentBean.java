@@ -20,6 +20,10 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import eu.bitwalker.useragentutils.UserAgent;
+import eu.bitwalker.useragentutils.OperatingSystem;
+import eu.bitwalker.useragentutils.DeviceType;
+
 public class ZUserAgentBean {
 
     private String mUserAgent;
@@ -54,6 +58,7 @@ public class ZUserAgentBean {
     boolean isWindowsNT = false;
     boolean isWindowsPhone = false;
     boolean isEdge = false;
+    boolean isTablet = false;
 
     // Refer bug 80330 for details.
     @Deprecated
@@ -68,6 +73,9 @@ public class ZUserAgentBean {
     
     private void parseUserAgent(String agent) {
         // parse user agent
+        UserAgent userAgent = UserAgent.parseUserAgentString(agent);
+        DeviceType deviceType = userAgent.getOperatingSystem().getDeviceType();
+        
         String agt = agent.toLowerCase();
         StringTokenizer agtArr = new StringTokenizer(agt, " ;()");
         int index = -1;
@@ -157,10 +165,10 @@ public class ZUserAgentBean {
                 }else if ((index = token.indexOf("version/")) != -1){
                     //In case of safari, get the browser version here
                     browserVersion = new Version(token.substring(index + 8));
-                }else if (token.indexOf("mobile") != -1) {
+                }else if (DeviceType.MOBILE.equals(deviceType)) {
                     isMobile = true;
-                } else if (token.indexOf("touch") != -1 || token.indexOf("tablet") != -1) {
-                    isMobile = true;
+                } else if (DeviceType.TABLET.equals(deviceType)) {
+                    isTablet = true;
                 } else if (token.equals("os") && (isIPhone || isIPod || isTouchiPad)) {
                     isTokenOS = true;
                 } else if (isTokenAndroid && token.matches("^(\\d).*")) {
@@ -311,6 +319,8 @@ public class ZUserAgentBean {
     public boolean getIsTouchiPad() { return isTouchiPad; }
 
     public boolean getIsMobile() { return isMobile; }
+
+    public boolean getIsTablet() { return isTablet; }
 
     public boolean getIsWindowsNT() { return isWindowsNT; }
 
