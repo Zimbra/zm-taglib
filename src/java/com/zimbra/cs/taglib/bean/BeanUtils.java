@@ -659,6 +659,15 @@ public class BeanUtils {
 
     public static String getServerName(PageContext pc) {
 		String serverName = pc.getRequest().getParameter("customerDomain");
+		String userName = pc.getRequest().getParameter("username");
+
+		if (serverName == null && userName != null) {
+			int atIdx = userName.indexOf("@");
+			if (atIdx != -1) {
+				serverName = userName.substring(atIdx+1);
+			}
+		}
+
         return serverName != null ? serverName.trim() : HttpUtil.getVirtualHost((HttpServletRequest) pc.getRequest());
     }
     
