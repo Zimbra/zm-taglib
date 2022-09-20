@@ -37,6 +37,7 @@ import com.zimbra.common.util.WebSplitUtil;
 import com.zimbra.common.util.ZimbraCookie;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
 import com.zimbra.cs.account.AccountServiceException;
+import com.zimbra.cs.taglib.bean.BeanUtils;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.cs.taglib.ngxlookup.NginxRouteLookUpConnector;
 
@@ -197,6 +198,10 @@ public class LoginTag extends ZimbraSimpleTag {
             }
             options.setOriginalUserAgent(request.getHeader("User-Agent"));
             ZMailbox mbox = ZMailbox.getMailbox(options);
+            ZAuthResult authResult = mbox.getAuthResult();
+            if (!authResult.getTwoFactorAuthRequired()) {
+                BeanUtils.checkWebClientEnabled(mbox);
+            }
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 
             String refer = mbox.getAuthResult().getRefer();
@@ -211,7 +216,7 @@ public class LoginTag extends ZimbraSimpleTag {
                         mbox.getAuthResult().getExpires());
             }
 
-            ZAuthResult authResult = mbox.getAuthResult();
+            
             if (authResult.getTrustedToken() != null) {
                 setTrustedCookie(response,
                         authResult.getTrustedToken(),
