@@ -7196,6 +7196,13 @@
     </function>
 
     <function>
+        <name>displayMsgDateWithTemplate</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.String
+            displayMsgDate(javax.servlet.jsp.PageContext,java.util.Date, java.lang.String, java.lang.String)</function-signature>
+    </function>
+
+    <function>
         <name>displayVoiceDate</name>
         <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
         <function-signature>java.lang.String
@@ -7207,6 +7214,13 @@
         <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
         <function-signature>java.lang.String
             displayDate(javax.servlet.jsp.PageContext,java.util.Date)</function-signature>
+    </function>
+
+    <function>
+        <name>displayDateWithTemplate</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.String
+            displayDate(javax.servlet.jsp.PageContext,java.util.Date,java.lang.String)</function-signature>
     </function>
 
     <function>
@@ -7777,9 +7791,21 @@
     </function>
 
     <function>
+        <name>getRepeatBlurbWithTemplate</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.String getRepeatBlurb(com.zimbra.client.ZSimpleRecurrence,javax.servlet.jsp.PageContext,java.util.TimeZone,java.util.Date,java.lang.String)</function-signature>
+    </function>
+
+    <function>
         <name>getApptDateBlurb</name>
         <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
         <function-signature>java.lang.String getApptDateBlurb(javax.servlet.jsp.PageContext,java.util.TimeZone,long,long,boolean)</function-signature>
+    </function>
+
+    <function>
+        <name>getApptDateBlurbWithTemplate</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.String getApptDateBlurb(javax.servlet.jsp.PageContext,java.util.TimeZone,long,long,boolean,java.lang.String,java.lang.String)</function-signature>
     </function>
 
     <function>
