@@ -577,6 +577,16 @@ public class BeanUtils {
        return prov.getConfig().getBooleanAttr(attr, false) || ProvisioningConstants.TRUE.equals(getAttr(pc, attr));
    }
 
+   public static boolean isDomainLoginPageEnabled() throws JspException, ServiceException {
+       Provisioning prov = Provisioning.getInstance();
+       return prov.getConfig().isDomainLoginPageEnabled();
+   }
+
+   public static String getDomainLoginPageErrorPath() throws JspException, ServiceException {
+       Provisioning prov = Provisioning.getInstance();
+       return prov.getConfig().getDomainLoginPageErrorPath();
+   }
+
     public static String getMailURL(PageContext pc) {
         try {
             return Provisioning.getInstance().getLocalServer().getMailURL();

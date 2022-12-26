@@ -7365,6 +7365,18 @@
 	</function>
 
     <function>
+        <name>isDomainLoginPageEnabled</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>boolean isDomainLoginPageEnabled()</function-signature>
+    </function>
+
+    <function>
+        <name>getDomainLoginPageErrorPath</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>boolean getDomainLoginPageErrorPath()</function-signature>
+    </function>
+
+    <function>
         <name>getAddressBook</name>
         <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
         <function-signature>com.zimbra.client.ZFilterCondition.ZAddressBookCondition getAddressBook(com.zimbra.client.ZFilterCondition)</function-signature>
