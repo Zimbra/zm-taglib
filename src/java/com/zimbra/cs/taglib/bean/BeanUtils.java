@@ -453,6 +453,10 @@ public class BeanUtils {
     }
 
     public static String displayMsgDate(PageContext pc, Date msg) throws ServiceException, JspException {
+        return displayMsgDate(pc, msg, null, null);
+    }
+
+    public static String displayMsgDate(PageContext pc, Date msg, String timeTemplate, String dateTemplate) throws ServiceException, JspException {
         ZMailbox mbox = ZJspSession.getZMailbox(pc);
         TimeZone tz = mbox.getPrefs().getTimeZone();
         Calendar cal = Calendar.getInstance(tz);
@@ -463,9 +467,15 @@ public class BeanUtils {
         long nowTime = cal.getTimeInMillis();
         long msgTime = msg.getTime();
 
+        Locale locale = I18nUtil.findLocale(pc);
         if (msgTime >= nowTime) {
             // show hour and return
-            DateFormat df = getDateFormat(pc, DateTimeFmt.DTF_TIME_SHORT);
+            DateFormat df;
+            if (timeTemplate != null && timeTemplate.length() > 0) {
+                df = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, timeTemplate), locale);
+            } else {
+                df = getDateFormat(pc, DateTimeFmt.DTF_TIME_SHORT);
+            }
             df.setTimeZone(tz);
             return df.format(msg);
         }
@@ -474,27 +484,35 @@ public class BeanUtils {
         cal.setTimeInMillis(msgTime);
         long msgYear = cal.get(Calendar.YEAR);
 
-        Locale locale = I18nUtil.findLocale(pc);
         if (nowYear == msgYear) {
             DateFormat df = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, "ZM_formatDateMediumNoYear"),locale);
             df.setTimeZone(tz);
             return df.format(msg);
         } else {
-			return displayDate(pc, msg, tz);
+            return displayDate(pc, msg, tz, dateTemplate);
         }
     }
 
-	public static String displayDate(PageContext pc, Date msg) throws ServiceException, JspException {
-		ZMailbox mbox = ZJspSession.getZMailbox(pc);
-		TimeZone tz = mbox.getPrefs().getTimeZone();
-		return displayDate(pc, msg, tz);
-	}
+    public static String displayDate(PageContext pc, Date msg) throws ServiceException, JspException {
+        return displayDate(pc, msg, null);
+    }
 
-	private static String displayDate(PageContext pc, Date msg, TimeZone tz) {
-		DateFormat df = getDateFormat(pc, DateTimeFmt.DTF_DATE_SHORT);
-		df.setTimeZone(tz);
-		return df.format(msg);
-	}
+    public static String displayDate(PageContext pc, Date msg, String dateTemplate) throws ServiceException, JspException {
+        ZMailbox mbox = ZJspSession.getZMailbox(pc);
+        TimeZone tz = mbox.getPrefs().getTimeZone();
+        return displayDate(pc, msg, tz, dateTemplate);
+    }
+
+    private static String displayDate(PageContext pc, Date msg, TimeZone tz, String dateTemplate) {
+        DateFormat df;
+        if (dateTemplate != null && dateTemplate.length() > 0) {
+            df = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, dateTemplate), I18nUtil.findLocale(pc));
+        } else {
+            df = getDateFormat(pc, DateTimeFmt.DTF_DATE_SHORT);
+        }
+        df.setTimeZone(tz);
+        return df.format(msg);
+    }
 
 	public static String displayDuration(PageContext pc, long duration) throws ServiceException, JspException {
         long totalSeconds = duration / 1000;
@@ -1265,6 +1283,10 @@ public class BeanUtils {
     }
 
     public static String getRepeatBlurb(ZSimpleRecurrence repeat, PageContext pc, TimeZone timeZone, Date startDate) {
+        return getRepeatBlurb(repeat, pc, timeZone, startDate, null);
+    }
+
+    public static String getRepeatBlurb(ZSimpleRecurrence repeat, PageContext pc, TimeZone timeZone, Date startDate, String dateTemplate) {
         String r = "";
         Calendar cal;
 
@@ -1353,6 +1375,7 @@ public class BeanUtils {
         if (repeat.getType() == ZSimpleRecurrenceType.NONE)
             return r;
 
+        Locale locale = I18nUtil.findLocale(pc);
         String e = "";
 
         switch (repeat.getEnd()) {
@@ -1363,7 +1386,12 @@ public class BeanUtils {
                 e = I18nUtil.getLocalizedMessage(pc, "recurEndNumber", new Object[] {repeat.getCount()});
                 break;
             case UNTIL:
-                DateFormat untilDf = DateFormat.getDateInstance(DateFormat.MEDIUM, pc.getRequest().getLocale());
+                DateFormat untilDf;
+                if (dateTemplate != null && dateTemplate.length() > 0) {
+                    untilDf = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, dateTemplate), locale);
+                } else {
+                    untilDf = DateFormat.getDateInstance(DateFormat.MEDIUM, pc.getRequest().getLocale());
+                }
                 if (timeZone != null) untilDf.setTimeZone(timeZone);
                 String untilDate = untilDf.format(repeat.getUntilDate().getDate());
                 e = I18nUtil.getLocalizedMessage(pc, "recurEndByDate", new Object[] { untilDate});
@@ -1372,7 +1400,12 @@ public class BeanUtils {
 
         String s = "";
         if (startDate != null) {
-            DateFormat startDf = DateFormat.getDateInstance(DateFormat.MEDIUM, pc.getRequest().getLocale());
+            DateFormat startDf;
+            if (dateTemplate != null && dateTemplate.length() > 0) {
+                startDf = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, dateTemplate), locale);
+            } else {
+                startDf = DateFormat.getDateInstance(DateFormat.MEDIUM, pc.getRequest().getLocale());
+            }
             if (timeZone != null) startDf.setTimeZone(timeZone);
             s = I18nUtil.getLocalizedMessage(pc, "recurStart", new Object[] { startDf.format(startDate)});
 
@@ -1382,12 +1415,29 @@ public class BeanUtils {
     }
 
     public static String getApptDateBlurb(PageContext pc, TimeZone timeZone, long startTime, long endTime, boolean allDay) {
+        return getApptDateBlurb(pc, timeZone, startTime, endTime, allDay, null, null);
+    }
+
+    public static String getApptDateBlurb(PageContext pc, TimeZone timeZone, long startTime, long endTime, boolean allDay, String dateTemplate, String timeTemplate) {
         Calendar startCal = getCalendar(startTime, timeZone);
         Calendar endCal = getCalendar(endTime, timeZone);
 
-        DateFormat df = DateFormat.getDateInstance(DateFormat.FULL, I18nUtil.findLocale(pc));
-        DateFormat tf = DateFormat.getTimeInstance(DateFormat.SHORT, I18nUtil.findLocale(pc));
-        
+        Locale locale = I18nUtil.findLocale(pc);
+        DateFormat df;
+        DateFormat tf;
+
+        if (dateTemplate != null && dateTemplate.length() > 0) {
+            df = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, dateTemplate), locale);
+        } else {
+            df = DateFormat.getDateInstance(DateFormat.FULL, locale);
+        }
+
+        if (timeTemplate != null && timeTemplate.length() > 0) {
+            tf = new SimpleDateFormat(I18nUtil.getLocalizedMessage(pc, timeTemplate), locale);
+        } else {
+            tf = DateFormat.getTimeInstance(DateFormat.SHORT, locale);
+        }
+
         if (timeZone != null) {
             df.setTimeZone(timeZone);
             tf.setTimeZone(timeZone);
