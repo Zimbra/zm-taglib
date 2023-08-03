@@ -36,18 +36,20 @@ public class GetAllContactsTag extends ZimbraSimpleTag {
     private String mFolderId;
     private String mContactIds;
     private boolean mSync;
+    private boolean mDerefGroupMember;
 
     public void setVar(String var) { this.mVar = var; }
     public void setFolderId(String folderid) { this.mFolderId = folderid; }
     public void setContactIds(String ids) { this.mContactIds = ids; }
     public void setSync(boolean sync) { this.mSync = sync; }
+    public void setDerefGroupMember(boolean derefGroupMember) { this.mDerefGroupMember = derefGroupMember; }
 
     public void doTag() throws JspException, IOException {
         JspContext jctxt = getJspContext();
         try {
             ZMailbox mbox = getMailbox();
             List<ZContactBean> contactBeanList = new ArrayList<ZContactBean>();
-            List<ZContact> contactList = mbox.getContactsForFolder(mFolderId, mContactIds, null, false, null);
+            List<ZContact> contactList = mbox.getContactsForFolder(mFolderId, mContactIds, null, false, null, mDerefGroupMember);
             for(ZContact contact: contactList) {
               contactBeanList.add(new ZContactBean(contact));
             }
