@@ -59,7 +59,11 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 import com.zimbra.cs.taglib.tag.i18n.I18nUtil;
 import com.zimbra.cs.account.Account;
+import com.zimbra.cs.account.AuthTokenException;
+import com.zimbra.cs.account.AuthToken.Usage;
+import com.zimbra.cs.account.AuthTokenProperties;
 import com.zimbra.cs.account.Provisioning;
+import com.zimbra.cs.account.TokenUtil;
 import com.zimbra.cs.mailbox.Contact;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
@@ -1970,6 +1974,22 @@ public class BeanUtils {
         if (!mbox.getFeatures().getWebClientEnabled()) {
             throw AccountServiceException.WEB_CLIENT_ACCESS_NOT_ALLOWED(mbox.getName());
         }
+    }
+
+    public static boolean isTFARequired(PageContext pc) throws Exception {
+        try {
+            String authtoken = ZJspSession.getAuthToken(pc).getValue();
+            String[] tokenParts = authtoken.split("_");
+            String target = tokenParts[2];
+            Map<?, ?> decodedTokenMap = TokenUtil.getAttrs(target);
+            String usage = (String) decodedTokenMap.get(AuthTokenProperties.C_USAGE);
+            if (Usage.TWO_FACTOR_AUTH.getCode().equals(usage)) {
+                return true;
+            }
+        } catch (Exception e) {
+            // no authtoken, parse error etc.
+        }
+        return false;
     }
 }
 
