@@ -16,8 +16,8 @@
  */
 package com.zimbra.cs.taglib.tag;
 
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.jsp.JspContext;

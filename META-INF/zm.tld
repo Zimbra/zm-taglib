@@ -7036,6 +7036,13 @@
             <rtexprvalue>true</rtexprvalue>
             <type>java.lang.String</type>
         </attribute>
+        <attribute>
+            <description>authResult</description>
+            <name>authResult</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>com.zimbra.client.ZAuthResult</type>
+        </attribute>
     </tag>
 
 	<!-- These tags are copied from jstl.tld because we implement our own

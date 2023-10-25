@@ -17,6 +17,7 @@
 package com.zimbra.cs.taglib.bean;
 
 import com.zimbra.common.account.ProvisioningConstants;
+import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.calendar.TZIDMapper;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.HttpUtil;
@@ -1977,8 +1978,13 @@ public class BeanUtils {
     }
 
     public static boolean isTFARequired(PageContext pc) throws Exception {
+        ZAuthToken zAuthToken = ZJspSession.getAuthToken(pc);
+        return isTFARequired(zAuthToken);
+    }
+
+    public static boolean isTFARequired(ZAuthToken zAuthToken) throws Exception {
         try {
-            String authtoken = ZJspSession.getAuthToken(pc).getValue();
+            String authtoken = zAuthToken.getValue();
             String[] tokenParts = authtoken.split("_");
             String target = tokenParts[2];
             Map<?, ?> decodedTokenMap = TokenUtil.getAttrs(target);
