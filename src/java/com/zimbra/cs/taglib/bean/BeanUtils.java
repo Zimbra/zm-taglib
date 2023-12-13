@@ -82,9 +82,13 @@ import java.util.regex.Pattern;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import com.zimbra.cs.account.Server;
+import java.net.MalformedURLException;
 
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
+import com.zimbra.common.util.ZimbraLog;
 
 public class BeanUtils {
 
@@ -1864,6 +1868,47 @@ public class BeanUtils {
 	 */
 	public static String cook(String in) {
 		return StringUtil.escapeHtml(in);
+	}
+
+	/**
+	 * "validatePostLoginUrl" the input string. (validate url for postLoginUrl.)
+	 */
+	public static Boolean validatePostLoginUrl(String postLoginUrl) {
+		String hostname = null;
+		try {
+			URL url = new URL(postLoginUrl);
+			hostname = url.getHost();
+		} catch (MalformedURLException e) {
+			ZimbraLog.webclient.debug("validatePostLoginUrl: error while getting hostname from post login url", e);
+			return false;
+		}
+
+		ZimbraLog.webclient.debug("validatePostLoginUrl: hostname %s from post login url %s", hostname, postLoginUrl);
+
+		if (hostname == null) {
+			return false;
+		}
+
+		boolean isValidHostname = false;
+		List<Server> serverList = null;
+		try {
+			serverList = Provisioning.getInstance().getAllMailClientServers();
+		} catch(ServiceException e) {
+			ZimbraLog.webclient.debug("validatePostLoginUrl: error while getting all mail client servers", e);
+			return false;
+		}
+
+		if (serverList != null) {
+			for (Server server : serverList) {
+				String serverName = server.getAttr(Provisioning.A_zimbraServiceHostname, "");
+				ZimbraLog.webclient.debug("validatePostLoginUrl: serverName %s from mail client servers to validate against post login url", serverName);
+				if (serverName != null && serverName.equals(hostname)) {
+					isValidHostname = true;
+					break;
+				}
+			}
+		}
+		return isValidHostname;
 	}
 
     /**
