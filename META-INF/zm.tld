@@ -7955,6 +7955,12 @@
     </function>
 
     <function>
+        <name>validatePostLoginUrl</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.Boolean validatePostLoginUrl(java.lang.String)</function-signature>
+    </function>
+
+    <function>
             <name>textToHtml</name>
             <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
             <function-signature>java.lang.String textToHtml(java.lang.String)</function-signature>
