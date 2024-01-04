@@ -90,7 +90,7 @@ public class SendTwoFactorAuthCodeTag extends ZimbraSimpleTag {
 
             ZimbraLog.webclient.debug("SendTwoFactorAuthCodeRequest with action=" + action + " and method=" + mMethod);
             Element resp = transport.invokeWithoutSession(req);
-            String status = resp.getAttribute(AccountConstants.A_STATUS);
+            String status = resp.getElement(AccountConstants.A_STATUS).getText();
             if ((AccountConstants.E_TWO_FACTOR_METHOD_APP.equals(mMethod) &&
                     SendTwoFactorAuthCodeStatus.RESET_FAILED.toString().equals(status)) ||
                 (AccountConstants.E_TWO_FACTOR_METHOD_EMAIL.equals(mMethod) &&
