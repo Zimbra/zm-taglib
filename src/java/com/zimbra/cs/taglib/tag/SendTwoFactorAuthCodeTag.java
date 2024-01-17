@@ -83,10 +83,11 @@ public class SendTwoFactorAuthCodeTag extends ZimbraSimpleTag {
             authtoken = zAuthToken.getValue();
 
             SoapHttpTransport transport = new SoapHttpTransport(soapUri);
+            transport.setAuthToken(authtoken);
+
             XMLElement req = new XMLElement(AccountConstants.E_SEND_TWO_FACTOR_AUTH_CODE_REQUEST);
             req.addAttribute(XMLElement.A_NAMESPACE, AccountConstants.NAMESPACE_STR);
             req.addUniqueElement(AccountConstants.E_ACTION).setText(action);
-            req.addUniqueElement(AccountConstants.E_AUTH_TOKEN).setText(authtoken);
 
             ZimbraLog.webclient.debug("SendTwoFactorAuthCodeRequest with action=" + action + " and method=" + mMethod);
             Element resp = transport.invokeWithoutSession(req);
