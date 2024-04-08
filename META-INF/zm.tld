@@ -2190,6 +2190,13 @@
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+
+        <attribute>
+            <description>derefContactGroupMember</description>
+            <name>derefGroupMember</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
     </tag>
 
     <tag>
@@ -6935,6 +6942,109 @@
         </attribute>
     </tag>
 
+    <tag>
+        <description>
+            get configuration for two-factor authentication (TFA)
+        </description>
+        <name>getTwoFactorAuthConfig</name>
+        <tag-class>com.zimbra.cs.taglib.tag.GetTwoFactorAuthConfigTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>ZAuthResult object to use</description>
+            <name>authResult</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>com.zimbra.client.ZAuthResult</type>
+        </attribute>
+        <attribute>
+            <description>
+                exception to check if TFA setup is required
+            </description>
+            <name>exception</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>com.zimbra.cs.taglib.bean.ZExceptionBean</type>
+        </attribute>
+        <attribute>
+            <description>
+                username to check if TFA setup is required
+            </description>
+            <name>username</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                variable to store allowed TFA method(s)
+            </description>
+            <name>varTFAMethodAllowed</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                variable to store enabled TFA method(s)
+            </description>
+            <name>varTFAMethodEnabled</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                variable to store a TFA method to be used
+            </description>
+            <name>varMethod</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                variable to store a masked email address
+            </description>
+            <name>varMaskedEmailAddress</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>
+                variable to store whether reset password feature is enabled and recovery email address is verified
+            </description>
+            <name>varResetPasswordEnabled</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
+    <tag>
+        <description>
+            call SendTwoFactorAuthCodeRequest
+        </description>
+        <name>sendTwoFactorAuthCode</name>
+        <tag-class>com.zimbra.cs.taglib.tag.SendTwoFactorAuthCodeTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>varResult</description>
+            <name>varResult</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>method</description>
+            <name>method</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>authResult</description>
+            <name>authResult</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>com.zimbra.client.ZAuthResult</type>
+        </attribute>
+    </tag>
+
 	<!-- These tags are copied from jstl.tld because we implement our own
 	     versions but want to keep API compatibility. -->
 	<!--
@@ -7363,6 +7473,18 @@
 		<function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
         <function-signature>boolean isProvOrAttr(javax.servlet.jsp.PageContext, java.lang.String)</function-signature>
 	</function>
+
+    <function>
+        <name>isDomainLoginPageEnabled</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>boolean isDomainLoginPageEnabled()</function-signature>
+    </function>
+
+    <function>
+        <name>getDomainLoginPageErrorPath</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>boolean getDomainLoginPageErrorPath()</function-signature>
+    </function>
 
     <function>
         <name>getAddressBook</name>
@@ -7981,6 +8103,12 @@
     </function>
 
     <function>
+        <name>validatePostLoginUrl</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.Boolean validatePostLoginUrl(java.lang.String)</function-signature>
+    </function>
+
+    <function>
             <name>textToHtml</name>
             <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
             <function-signature>java.lang.String textToHtml(java.lang.String)</function-signature>
@@ -8105,5 +8233,11 @@
 		<function-class>com.zimbra.common.util.StringUtil</function-class>
         <function-signature>java.lang.String nonNull(java.lang.String)</function-signature>
 	</function>
+
+    <function>
+        <name>isTwoFactorAuthRequired</name>
+        <function-class>com.zimbra.cs.taglib.bean.BeanUtils</function-class>
+        <function-signature>java.lang.Boolean isTwoFactorAuthRequired(javax.servlet.jsp.PageContext)</function-signature>
+    </function>
 
 </taglib>

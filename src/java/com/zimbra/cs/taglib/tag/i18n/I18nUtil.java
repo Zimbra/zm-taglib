@@ -72,6 +72,9 @@ public class I18nUtil {
 
 	private static final String A_SKIN = "skin";
 
+	public static final String P_DEFAULT_SKIN = "zimbraDefaultSkin";
+	protected static final String MANIFEST = "manifest.xml";
+
 	//
 	// Static functions
 	//
@@ -264,9 +267,29 @@ public class I18nUtil {
 	}
 
 	// bundle query
+	public static String getSkin(PageContext pageContext) {
+		String skin = (String)findObject(pageContext, A_SKIN);
+
+		// is the skin even present?
+		if (skin != null) {
+			File manifest = new File(pageContext.getServletContext().getRealPath("/skins/"+skin+"/"+MANIFEST));
+			if (!manifest.exists()) {
+				ZimbraLog.webclient.debug("selected skin ("+skin+") doesn't exist");
+				skin = null;
+			}
+		}
+
+		// fall back to default skin
+		if (skin == null) {
+			skin = pageContext.getServletContext().getInitParameter(P_DEFAULT_SKIN);
+			// ZimbraLog.webclient.debug("### default: "+skin);
+		}
+
+		return skin;
+	}
 
 	public static String makeBasename(PageContext pageContext, String basename) {
-		String skin = (String)findObject(pageContext, A_SKIN);
+		String skin = getSkin(pageContext);
 		return skin != null ? "/skins/"+skin+basename : basename;
 	}
 
@@ -274,9 +297,8 @@ public class I18nUtil {
 		return makeBundleKey(pageContext, basename, findLocale(pageContext));
 	}
 	public static String makeBundleKey(PageContext pageContext, String basename, Locale locale) {
-		String skin = (String)findObject(pageContext, A_SKIN);
-		if (skin == null) skin = "[unknown]";
-		return skin+":"+basename+":"+locale+":"+DEFAULT_BUNDLE_KEY;
+		String skin = getSkin(pageContext);
+		return skin != null ? skin+":"+basename+":"+locale+":"+DEFAULT_BUNDLE_KEY : basename+":"+locale+":"+DEFAULT_BUNDLE_KEY;
 	}
 
 	public static ResourceBundle findBundle(PageContext pageContext) {

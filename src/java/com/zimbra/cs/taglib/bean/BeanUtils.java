@@ -17,6 +17,7 @@
 package com.zimbra.cs.taglib.bean;
 
 import com.zimbra.common.account.ProvisioningConstants;
+import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.calendar.TZIDMapper;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.HttpUtil;
@@ -59,7 +60,11 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 import com.zimbra.cs.taglib.tag.i18n.I18nUtil;
 import com.zimbra.cs.account.Account;
+import com.zimbra.cs.account.AuthTokenException;
+import com.zimbra.cs.account.AuthToken.Usage;
+import com.zimbra.cs.account.AuthTokenProperties;
 import com.zimbra.cs.account.Provisioning;
+import com.zimbra.cs.account.TokenUtil;
 import com.zimbra.cs.mailbox.Contact;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
@@ -77,9 +82,13 @@ import java.util.regex.Pattern;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import com.zimbra.cs.account.Server;
+import java.net.MalformedURLException;
 
 import org.mozilla.javascript.ErrorReporter;
 import org.mozilla.javascript.EvaluatorException;
+import com.zimbra.common.util.ZimbraLog;
 
 public class BeanUtils {
 
@@ -575,6 +584,16 @@ public class BeanUtils {
    public static boolean isProvOrAttr(PageContext pc, String attr) throws JspException, ServiceException {
        Provisioning prov = Provisioning.getInstance();
        return prov.getConfig().getBooleanAttr(attr, false) || ProvisioningConstants.TRUE.equals(getAttr(pc, attr));
+   }
+
+   public static boolean isDomainLoginPageEnabled() throws JspException, ServiceException {
+       Provisioning prov = Provisioning.getInstance();
+       return prov.getConfig().isDomainLoginPageEnabled();
+   }
+
+   public static String getDomainLoginPageErrorPath() throws JspException, ServiceException {
+       Provisioning prov = Provisioning.getInstance();
+       return prov.getConfig().getDomainLoginPageErrorPath();
    }
 
     public static String getMailURL(PageContext pc) {
@@ -1851,6 +1870,47 @@ public class BeanUtils {
 		return StringUtil.escapeHtml(in);
 	}
 
+	/**
+	 * "validatePostLoginUrl" the input string. (validate url for postLoginUrl.)
+	 */
+	public static Boolean validatePostLoginUrl(String postLoginUrl) {
+		String hostname = null;
+		try {
+			URL url = new URL(postLoginUrl);
+			hostname = url.getHost();
+		} catch (MalformedURLException e) {
+			ZimbraLog.webclient.debug("validatePostLoginUrl: error while getting hostname from post login url", e);
+			return false;
+		}
+
+		ZimbraLog.webclient.debug("validatePostLoginUrl: hostname %s from post login url %s", hostname, postLoginUrl);
+
+		if (hostname == null) {
+			return false;
+		}
+
+		boolean isValidHostname = false;
+		List<Server> serverList = null;
+		try {
+			serverList = Provisioning.getInstance().getAllMailClientServers();
+		} catch(ServiceException e) {
+			ZimbraLog.webclient.debug("validatePostLoginUrl: error while getting all mail client servers", e);
+			return false;
+		}
+
+		if (serverList != null) {
+			for (Server server : serverList) {
+				String serverName = server.getAttr(Provisioning.A_zimbraServiceHostname, "");
+				ZimbraLog.webclient.debug("validatePostLoginUrl: serverName %s from mail client servers to validate against post login url", serverName);
+				if (serverName != null && serverName.equals(hostname)) {
+					isValidHostname = true;
+					break;
+				}
+			}
+		}
+		return isValidHostname;
+	}
+
     /**
      * Uncooks the input string (Replaces the special characters with their equivalent HTML entities.)
        */
@@ -1960,6 +2020,32 @@ public class BeanUtils {
         if (!mbox.getFeatures().getWebClientEnabled()) {
             throw AccountServiceException.WEB_CLIENT_ACCESS_NOT_ALLOWED(mbox.getName());
         }
+    }
+
+    public static boolean isTwoFactorAuthRequired(PageContext pc) throws Exception {
+        ZAuthToken zAuthToken;
+        try {
+            zAuthToken = ZJspSession.getAuthToken(pc);
+        } catch (Exception e) {
+            return false;
+        }
+        return isTwoFactorAuthRequired(zAuthToken);
+    }
+
+    public static boolean isTwoFactorAuthRequired(ZAuthToken zAuthToken) {
+        try {
+            String authtoken = zAuthToken.getValue();
+            String[] tokenParts = authtoken.split("_");
+            String target = tokenParts[2];
+            Map<?, ?> decodedTokenMap = TokenUtil.getAttrs(target);
+            String usage = (String) decodedTokenMap.get(AuthTokenProperties.C_USAGE);
+            if (Usage.TWO_FACTOR_AUTH.getCode().equals(usage)) {
+                return true;
+            }
+        } catch (Exception e) {
+            // no authtoken, parse error etc.
+        }
+        return false;
     }
 }
 
