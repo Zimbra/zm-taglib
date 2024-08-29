@@ -1301,6 +1301,14 @@
             <required>false</required>
             <rtexprvalue>true</rtexprvalue>
         </attribute>
+        <attribute>
+            <description>
+                csrf token
+            </description>
+            <name>csrfToken</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
++        </attribute>
     </tag>
 
     <tag>
