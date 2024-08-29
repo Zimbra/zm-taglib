@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspContext;
@@ -37,8 +38,8 @@ import com.zimbra.common.util.WebSplitUtil;
 import com.zimbra.common.util.ZimbraCookie;
 import com.zimbra.common.util.ngxlookup.NginxAuthServer;
 import com.zimbra.cs.account.AccountServiceException;
-import com.zimbra.cs.taglib.bean.BeanUtils;
 import com.zimbra.cs.taglib.ZJspSession;
+import com.zimbra.cs.taglib.bean.BeanUtils;
 import com.zimbra.cs.taglib.ngxlookup.NginxRouteLookUpConnector;
 
 public class LoginTag extends ZimbraSimpleTag {
@@ -157,8 +158,19 @@ public class LoginTag extends ZimbraSimpleTag {
                 options.setAccount(mUsername);
                 options.setPassword(mPassword);
                 options.setVirtualHost(getVirtualHost(request));
-                if (mNewPassword != null && mNewPassword.length() > 0)
+                if (mNewPassword != null && mNewPassword.length() > 0) {
                     options.setNewPassword(mNewPassword);
+                    Cookie[] cookies = request.getCookies();
+                    for (Cookie c : cookies){
+                        if (c.getName().equals(ZJspSession.COOKIE_NAME)) {
+                            String authtokenInCookie = c.getValue();
+                            if (BeanUtils.isPasswordChangeRequired(authtokenInCookie)) {
+                                options.setAuthToken(authtokenInCookie);
+                            }
+                            break;
+                        }
+                    }
+                }
             }
 
             if (mUrl == null) {
@@ -199,7 +211,13 @@ public class LoginTag extends ZimbraSimpleTag {
             options.setOriginalUserAgent(request.getHeader("User-Agent"));
             ZMailbox mbox = ZMailbox.getMailbox(options);
             ZAuthResult authResult = mbox.getAuthResult();
-            if (!authResult.getTwoFactorAuthRequired()) {
+            if (authResult.getResetPassword()) {
+                ZAuthToken resetPasswordAuthtoken = authResult.getAuthToken();
+                if (!BeanUtils.isPasswordChangeRequired(resetPasswordAuthtoken)) {
+                    throw ServiceException.FAILURE("Invalid authtoken for change password on account [" + mUsername + "]", null);
+                }
+            }
+            if (!authResult.getTwoFactorAuthRequired() && !authResult.getResetPassword()) {
                 BeanUtils.checkWebClientEnabled(mbox);
             }
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
@@ -216,7 +234,7 @@ public class LoginTag extends ZimbraSimpleTag {
                         mbox.getAuthResult().getExpires());
             }
 
-            
+
             if (authResult.getTrustedToken() != null) {
                 setTrustedCookie(response,
                         authResult.getTrustedToken(),
@@ -236,7 +254,7 @@ public class LoginTag extends ZimbraSimpleTag {
                 jctxt.setAttribute(mVarAuthResult, mbox.getAuthResult(), PageContext.REQUEST_SCOPE);
             }
 
-            if (!authResult.getTwoFactorAuthRequired()) {
+            if (!authResult.getTwoFactorAuthRequired() && !authResult.getResetPassword()) {
                 //bug: 75754 invoking import data request only when zimbraDataSourceImportOnLogin is set
                 boolean importDataOnLoginAttr = mbox.getFeatures().getDataSourceImportOnLogin();
                 if (mImportData && !mAdminPreAuth && importDataOnLoginAttr) {
