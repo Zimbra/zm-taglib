@@ -61,7 +61,6 @@ public class ZJspSession {
     public static final String ATTR_SESSION = ZJspSession.class.getCanonicalName()+".session";
     private static final String ATTR_TEMP_AUTHTOKEN = ZJspSession.class.getCanonicalName()+".authToken";
 
-    // AP-TODO: COOKIE_NAME is no longer used, retire
     public static final String COOKIE_NAME = "ZM_AUTH_TOKEN";
     public static final String ZM_LAST_SERVER_COOKIE_NAME = "ZM_LAST_SERVER";
     private static final String C_ID  = "id";
