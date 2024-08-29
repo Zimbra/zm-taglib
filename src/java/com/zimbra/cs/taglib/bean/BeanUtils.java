@@ -2047,6 +2047,26 @@ public class BeanUtils {
         }
         return false;
     }
+
+    public static boolean isPasswordChangeRequired(ZAuthToken zAuthToken) {
+        String authtoken = zAuthToken.getValue();
+        return isPasswordChangeRequired(authtoken);
+    }
+
+    public static boolean isPasswordChangeRequired(String authtoken) {
+        try {
+            String[] tokenParts = authtoken.split("_");
+            String target = tokenParts[2];
+            Map<?, ?> decodedTokenMap = TokenUtil.getAttrs(target);
+            String usage = (String) decodedTokenMap.get(AuthTokenProperties.C_USAGE);
+            if (Usage.RESET_PASSWORD.getCode().equals(usage)) {
+                return true;
+            }
+        } catch (Exception e) {
+            // no authtoken, parse error etc.
+        }
+        return false;
+    }
 }
 
 class ExtendedDateFormatSymbols extends DateFormatSymbols{
