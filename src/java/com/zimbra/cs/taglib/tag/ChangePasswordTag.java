@@ -16,6 +16,7 @@
  */
 package com.zimbra.cs.taglib.tag;
 
+import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.cs.taglib.ZJspSession;
 import com.zimbra.client.ZChangePasswordResult;
@@ -36,6 +37,7 @@ public class ChangePasswordTag extends ZimbraSimpleTag {
     private String mUrl = null;
     private boolean mSecure = ZJspSession.isProtocolModeHttps();
     private boolean mRememberMe;
+    private String mCsrfToken;
 
     public void setUsername(String username) { this.mUsername = username; }
 
@@ -49,12 +51,17 @@ public class ChangePasswordTag extends ZimbraSimpleTag {
 
     public void setRememberme(boolean rememberMe) { this.mRememberMe = rememberMe; }
 
+    public void setCsrfToken(String csrfToken) { this.mCsrfToken = csrfToken; }
+
     public void doTag() throws JspException, IOException {
         JspContext jctxt = getJspContext();
         try {
             PageContext pageContext = (PageContext) jctxt;
+            ZAuthToken zat = ZJspSession.getAuthToken(pageContext);
             ZMailbox.Options options = new ZMailbox.Options();
+            options.setAuthToken(zat);
             options.setAccount(mUsername);
+            options.setCsrfToken(mCsrfToken);
             options.setPassword(mPassword);
             options.setNewPassword(mNewPassword);
             options.setUri(mUrl == null ? ZJspSession.getSoapURL(pageContext): mUrl);
