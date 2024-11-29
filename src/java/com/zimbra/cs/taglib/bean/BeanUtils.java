@@ -17,6 +17,7 @@
 package com.zimbra.cs.taglib.bean;
 
 import com.zimbra.common.account.ProvisioningConstants;
+import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.calendar.TZIDMapper;
 import com.zimbra.common.service.ServiceException;
 import com.zimbra.common.util.HttpUtil;
@@ -59,7 +60,11 @@ import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 import com.zimbra.cs.taglib.tag.i18n.I18nUtil;
 import com.zimbra.cs.account.Account;
+import com.zimbra.cs.account.AuthTokenException;
+import com.zimbra.cs.account.AuthToken.Usage;
+import com.zimbra.cs.account.AuthTokenProperties;
 import com.zimbra.cs.account.Provisioning;
+import com.zimbra.cs.account.TokenUtil;
 import com.zimbra.cs.mailbox.Contact;
 import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 import com.yahoo.platform.yui.compressor.CssCompressor;
