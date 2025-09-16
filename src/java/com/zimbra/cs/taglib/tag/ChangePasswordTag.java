@@ -38,6 +38,7 @@ public class ChangePasswordTag extends ZimbraSimpleTag {
     private boolean mSecure = ZJspSession.isProtocolModeHttps();
     private boolean mRememberMe;
     private String mCsrfToken;
+    private String mVarNewCsrfToken;
 
     public void setUsername(String username) { this.mUsername = username; }
 
@@ -52,6 +53,8 @@ public class ChangePasswordTag extends ZimbraSimpleTag {
     public void setRememberme(boolean rememberMe) { this.mRememberMe = rememberMe; }
 
     public void setCsrfToken(String csrfToken) { this.mCsrfToken = csrfToken; }
+
+    public void setVarNewCsrfToken(String varNewCsrfToken) { this.mVarNewCsrfToken = varNewCsrfToken; };
 
     public void doTag() throws JspException, IOException {
         JspContext jctxt = getJspContext();
@@ -72,7 +75,8 @@ public class ChangePasswordTag extends ZimbraSimpleTag {
                     mSecure,
                     mRememberMe,
                     cpr.getExpires());
- 
+
+            jctxt.setAttribute(mVarNewCsrfToken, cpr.getCsrfToken(),  PageContext.PAGE_SCOPE);
         } catch (ServiceException e) {
 
             throw new JspTagException(e.getMessage(), e);

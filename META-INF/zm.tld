@@ -1306,9 +1306,17 @@
                 csrf token
             </description>
             <name>csrfToken</name>
-            <required>false</required>
+            <required>true</required>
             <rtexprvalue>true</rtexprvalue>
-+        </attribute>
+        </attribute>
+        <attribute>
+            <description>
+                new csrf token
+            </description>
+            <name>varNewCsrfToken</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
     </tag>
 
     <tag>
