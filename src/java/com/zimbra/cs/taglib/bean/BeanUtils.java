@@ -16,7 +16,9 @@
  */
 package com.zimbra.cs.taglib.bean;
 
+import com.zimbra.common.account.Key;
 import com.zimbra.common.account.ProvisioningConstants;
+import com.zimbra.common.account.ZAttrProvisioning;
 import com.zimbra.common.auth.ZAuthToken;
 import com.zimbra.common.calendar.TZIDMapper;
 import com.zimbra.common.service.ServiceException;
@@ -59,9 +61,11 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
 import com.zimbra.cs.taglib.tag.i18n.I18nUtil;
+import com.zimbra.soap.admin.type.CacheEntryType;
 import com.zimbra.cs.account.Account;
 import com.zimbra.cs.account.AuthTokenException;
 import com.zimbra.cs.account.AuthToken.Usage;
+import com.zimbra.cs.account.Provisioning.CacheEntry;
 import com.zimbra.cs.account.AuthTokenProperties;
 import com.zimbra.cs.account.Provisioning;
 import com.zimbra.cs.account.TokenUtil;
@@ -2066,6 +2070,46 @@ public class BeanUtils {
             // no authtoken, parse error etc.
         }
         return false;
+    }
+
+    public static Account getAccountFromAuthToken(String authtoken) {
+        return getAccountFromAuthToken(authtoken, false);
+    }
+
+    public static Account getAccountFromAuthToken(String authtoken, boolean flushCache) {
+        try {
+            String[] tokenParts = authtoken.split("_");
+            String target = tokenParts[2];
+            Map<?, ?> decodedTokenMap = TokenUtil.getAttrs(target);
+            String zimbraId = (String) decodedTokenMap.get(AuthTokenProperties.C_ID);
+            if (!StringUtil.isNullOrEmpty(zimbraId)) {
+                Provisioning prov = Provisioning.getInstance();
+                if (flushCache) {
+                    CacheEntry[] entries = new CacheEntry[1];
+                    entries[0] = new CacheEntry(Key.CacheEntryBy.id, zimbraId);
+                    prov.flushCache(CacheEntryType.account, entries);
+                }
+                return prov.getAccountById(zimbraId);
+            }
+        } catch (Exception e) {
+            // no authtoken, parse error etc.
+        }
+        return null;
+    }
+
+    public static String[] getPasswordConfigAttrs() {
+        String[] attributes = {
+                ZAttrProvisioning.A_zimbraPasswordMinLength,
+                ZAttrProvisioning.A_zimbraPasswordMinUpperCaseChars,
+                ZAttrProvisioning.A_zimbraPasswordMinLowerCaseChars,
+                ZAttrProvisioning.A_zimbraPasswordMinPunctuationChars,
+                ZAttrProvisioning.A_zimbraPasswordMinNumericChars,
+                ZAttrProvisioning.A_zimbraPasswordMinDigitsOrPuncs,
+                ZAttrProvisioning.A_zimbraFeatureAllowUsernameInPassword,
+                ZAttrProvisioning.A_zimbraPasswordAllowedChars,
+                ZAttrProvisioning.A_zimbraPasswordAllowedPunctuationChars
+        };
+        return attributes;
     }
 }
 
