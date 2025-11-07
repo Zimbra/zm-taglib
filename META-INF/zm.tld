@@ -7061,6 +7061,27 @@
         </attribute>
     </tag>
 
+    <tag>
+        <description>
+            get password configuration
+        </description>
+        <name>getPasswordConfig</name>
+        <tag-class>com.zimbra.cs.taglib.tag.GetPasswordConfigTag</tag-class>
+        <body-content>empty</body-content>
+        <attribute>
+            <description>varConfig</description>
+            <name>varConfig</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+        <attribute>
+            <description>authResult</description>
+            <name>authResult</name>
+            <required>true</required>
+            <rtexprvalue>true</rtexprvalue>
+        </attribute>
+    </tag>
+
 	<!-- These tags are copied from jstl.tld because we implement our own
 	     versions but want to keep API compatibility. -->
 	<!--

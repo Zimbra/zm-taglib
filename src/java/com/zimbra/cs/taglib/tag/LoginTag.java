@@ -180,6 +180,12 @@ public class LoginTag extends ZimbraSimpleTag {
                             if (BeanUtils.isPasswordChangeRequired(authtokenInCookie)) {
                                 options.setAuthToken(authtokenInCookie);
                             }
+                            // Overwrite mUsername and account at password change
+                            Account account = BeanUtils.getAccountFromAuthToken(authtokenInCookie);
+                            if (account != null) {
+                                setUsername(account.getName());
+                                options.setAccount(mUsername);
+                            }
                             break;
                         }
                     }
