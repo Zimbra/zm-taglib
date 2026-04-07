@@ -1,0 +1,51 @@
+version: 2.1
+
+jobs:
+  build_and_publish_jar:
+    working_directory: ~/zm-tagblib
+    docker:
+      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
+        auth:
+          username: $DOCKER_USER
+          password: $DOCKER_PASS
+    steps:
+      - checkout
+
+      - run:
+          name: Clone dependencies
+          command: |
+            git clone -b develop --single-branch https://github.com/Zimbra/zm-pkg-tool.git ~/zm-pkg-tool
+            git clone -b ZCS-18799 --single-branch https://github.com/Zimbra/zm-zcs.git ~/zm-zcs
+            git clone -b ZCS-18799 --single-branch https://github.com/Zimbra/zm-mailbox.git ~/zm-mailbox
+
+      - run:
+          name: Build JAR only
+          command: |
+            mkdir -p /home/build/.ivy2/cache
+            sudo apt-get update && sudo apt-get install ant-contrib -y
+
+            cd ~/zm-mailbox
+            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+            # IMPORTANT: only build jar (no pkg)
+            ant clean jar
+
+      - run:
+          name: Publish to Nexus
+          command: |
+            cd ~/zm-mailbox
+
+            # Use your ivy publish target
+            ant publish-remote \
+              -Dresolver=nexus \
+              -Dbuild.number=$CIRCLE_BUILD_NUM
+
+workflows:
+  version: 2
+  build_and_publish:
+    jobs:
+      - build_and_publish_jar:
+          filters:
+            branches:
+              only:
+                - poc
