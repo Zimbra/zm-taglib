@@ -1,7 +1,7 @@
 Steps to build
 --------------
 
-1. Clone the repo new
+1. Clone the repo new.
 
   `git clone ssh://git@stash.corp.synacor.com:7999/zimbra/zm-taglib.git`
 
