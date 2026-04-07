@@ -2,7 +2,7 @@ version: 2.1
 
 jobs:
   build_and_publish_jar:
-    working_directory: ~/zm-tagblib
+    working_directory: ~/zm-taglib
     docker:
       - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
         auth:
