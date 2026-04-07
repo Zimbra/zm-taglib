@@ -5,7 +5,7 @@ Steps to build
 
   `git clone ssh://git@stash.corp.synacor.com:7999/zimbra/zm-taglib.git`
 
-2. Run the command
+2. Run the command command
 
     `ant clean publish-local`
  
