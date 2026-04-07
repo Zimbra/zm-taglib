@@ -24,7 +24,7 @@ jobs:
             mkdir -p /home/build/.ivy2/cache
             sudo apt-get update && sudo apt-get install ant-contrib -y
 
-            cd ~/zm-mailbox
+            cd ~/zm-taglib
             export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
             # IMPORTANT: only build jar (no pkg)
@@ -33,7 +33,7 @@ jobs:
       - run:
           name: Publish to Nexus
           command: |
-            cd ~/zm-mailbox
+            cd ~/zm-taglib
 
             # Use your ivy publish target
             ant publish-remote \
