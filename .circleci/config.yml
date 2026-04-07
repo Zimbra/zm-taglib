@@ -45,6 +45,8 @@ workflows:
   build_and_publish:
     jobs:
       - build_and_publish_jar:
+          context:
+            - docker-dev-registry
           filters:
             branches:
               only:
