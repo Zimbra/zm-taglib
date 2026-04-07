@@ -3,13 +3,16 @@ version: 2.1
 jobs:
   build_and_publish_jar:
     working_directory: ~/zm-taglib
-    docker:
-      - image: $DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASS
+    machine:
+      image: ubuntu-2204:current
     steps:
       - checkout
+
+      - run:
+          name: Pull build image
+          command: |
+            echo "$DOCKER_PASS" | docker login "$DOCKER_REGISTRY" --username "$DOCKER_USER" --password-stdin
+            docker pull "$DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04"
 
       - run:
           name: Clone dependencies
@@ -21,24 +24,22 @@ jobs:
       - run:
           name: Build JAR only
           command: |
-            mkdir -p /home/build/.ivy2/cache
-            sudo apt-get update && sudo apt-get install ant-contrib -y
-
-            cd ~/zm-mailbox
-            export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-
-            # IMPORTANT: only build jar (no pkg)
-            ant clean publish-local
+            docker run --rm \
+              -v ~/zm-mailbox:/home/build/zm-mailbox \
+              -v /home/build/.ivy2:/home/build/.ivy2 \
+              -w /home/build/zm-mailbox \
+              "$DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04" \
+              bash -c "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 && ant clean publish-local"
 
       - run:
           name: Publish to Nexus
           command: |
-            cd ~/zm-mailbox
-
-            # Use your ivy publish target
-            ant publish-remote \
-              -Dresolver=nexus \
-              -Dbuild.number=$CIRCLE_BUILD_NUM
+            docker run --rm \
+              -v ~/zm-mailbox:/home/build/zm-mailbox \
+              -v /home/build/.ivy2:/home/build/.ivy2 \
+              -w /home/build/zm-mailbox \
+              "$DOCKER_REGISTRY/zm-base-os:devcore-ubuntu-22.04" \
+              bash -c "ant publish-remote -Dresolver=nexus -Dbuild.number=$CIRCLE_BUILD_NUM"
 
 workflows:
   version: 2
