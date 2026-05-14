@@ -189,11 +189,14 @@ workflows:
                branches:
                  only:
                    - develop
-   zcs_19027_downstream_trigger_test:
-      jobs:
+         # Same branch as main: after build (no publish on ZCS-19027). Avoid a separate workflow
+         # with no "requires", which would fire the trigger in parallel with checkout/build.
          - trigger_zm_admin_console:
+            name: trigger_zm_admin_console_after_build_zcs19027
             context:
                - circleci-downstream-trigger
+            requires:
+               - build
             filters:
                branches:
                  only:
