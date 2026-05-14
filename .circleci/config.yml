@@ -136,6 +136,24 @@ jobs:
       resource_class: small
       <<: *publish_job_steps
 
+   trigger_zm_admin_console:
+      docker:
+         - image: cimg/base:2024.01
+      resource_class: small
+      steps:
+         - run:
+            name: Trigger zm-admin-console pipeline (ZCS-19027 downstream)
+            command: |
+               set -euo pipefail
+               : "${DOWNSTREAM_CIRCLECI_TOKEN:?DOWNSTREAM_CIRCLECI_TOKEN must be set (e.g. circleci-downstream-trigger context)}"
+               SLUG="${DOWNSTREAM_PROJECT_SLUG:-gh/Zimbra/zm-admin-console}"
+               BRANCH="${DOWNSTREAM_BRANCH:-develop}"
+               echo "Triggering pipeline project=${SLUG} branch=${BRANCH}"
+               curl -fSs -X POST "https://circleci.com/api/v2/project/${SLUG}/pipeline" \
+                 -H "Circle-Token: ${DOWNSTREAM_CIRCLECI_TOKEN}" \
+                 -H "Content-Type: application/json" \
+                 -d "{\"branch\":\"${BRANCH}\"}"
+
 ############################################################################
 
 workflows:
@@ -162,3 +180,21 @@ workflows:
                branches:
                  only:
                    - develop
+         - trigger_zm_admin_console:
+            context:
+               - circleci-downstream-trigger
+            requires:
+               - publish
+            filters:
+               branches:
+                 only:
+                   - develop
+   zcs_19027_downstream_trigger_test:
+      jobs:
+         - trigger_zm_admin_console:
+            context:
+               - circleci-downstream-trigger
+            filters:
+               branches:
+                 only:
+                   - ZCS-19027
