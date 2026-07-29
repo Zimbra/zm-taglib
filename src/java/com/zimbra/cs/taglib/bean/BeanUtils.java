@@ -2107,7 +2107,9 @@ public class BeanUtils {
                 ZAttrProvisioning.A_zimbraPasswordMinDigitsOrPuncs,
                 ZAttrProvisioning.A_zimbraFeatureAllowUsernameInPassword,
                 ZAttrProvisioning.A_zimbraPasswordAllowedChars,
-                ZAttrProvisioning.A_zimbraPasswordAllowedPunctuationChars
+                ZAttrProvisioning.A_zimbraPasswordAllowedPunctuationChars,
+                ZAttrProvisioning.A_zimbraPasswordEnforceHistory,
+                ZAttrProvisioning.A_zimbraPasswordBlockCommonEnabled
         };
         return attributes;
     }
